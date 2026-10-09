@@ -105,16 +105,43 @@ SPDX-License-Identifier: LGPL-3.0-or-later
 | B2. 真机产物片段（来源为 Simulated） | 6 | ✅ 来源为设备自产 dump，仅保留触发缺陷的最小构造 |
 | C. 第三方逐字副本（Sodium） | 1 | 已从 git 排除 ✅ |
 
-**关于 A2 类（Flywheel 夹具）—— 本轮新识别，必须补齐申报**：
+**关于 A2 类（Flywheel 夹具）—— 已补全版权声明 ✅**
 
 | 文件 | 性质 | 上游 | 上游许可证 | 处置 |
 |---|---|---|---|---|
-| `flywheel_diffuse.frag` | 文件头自注 **"Verbatim from Engine-Room/Flywheel: assets/flywheel/flywheel/internal/diffuse.glsl"**，即**逐字副本** | Engine-Room/Flywheel | **MIT**（Flywheel 采用 MIT） | ⚠️ MIT 允许再分发，**但必须保留版权与许可声明**。见下方待办 T-4 |
-| `flywheel_int_macro.frag` | 自注 "**Faithful reduction**"（忠实还原，非逐字） | 同上 | — | 已是改写件，风险低 |
-| `flywheel_wavelet_int.frag` | 自注 "**Faithful reduction**" | 同上 | — | 同上 |
+| `flywheel_diffuse.frag` | **逐字副本**（verbatim copy） | Engine-Room/Flywheel `assets/flywheel/flywheel/internal/diffuse.glsl` | **MIT**，Copyright (c) 2021-2024 Jozufozu | ✅ 已在文件头附**完整 MIT 许可全文与版权行** |
+| `flywheel_int_macro.frag` | 忠实还原（faithful reduction），非逐字 | 同上 `flywheel/internal/wavelet.glsl` | 同上 | ✅ 已补版权行与许可摘要 |
+| `flywheel_wavelet_int.frag` | 忠实还原 | 同上 | 同上 | ✅ 已补版权行与许可指引 |
 
-> 三个文件都是本轮全量列举仓库文件时才发现的 —— 它们此前既不在
-> `fixtures/README.md` 的分类表里，也不在本文件的清单里。**已如实补记。**
+**Flywheel 的许可证全文**（`https://github.com/Engine-Room/Flywheel`，`LICENSE.md`，
+经 GitHub API 核实为 MIT）：
+
+```
+Copyright (c) 2021-2024 Jozufozu
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
+
+> 三个文件都是全量列举仓库文件时才发现的 —— 它们此前既不在
+> `fixtures/README.md` 的分类表里，也不在本文件的清单里。**现已如实补记。**
+
 
 **关于 B2 类**：`fixtures/device/device_*.frag|vert` 是从**我们自己设备**的
 `glesmod/native.log` 里转储出来的着色器源码（由本模组
@@ -143,9 +170,18 @@ SPDX-License-Identifier: LGPL-3.0-or-later
 |---|---|---|
 | **T-1** | 移除 `shader.c` 中内嵌的 4 个 Mojang GLSL 工具函数（见 §1.2），改为诊断+降级 | 中 |
 | **T-2** | 决定 B 类夹具（源自 BSL 的最小片段）的处置方式：改写为原创 / 保留并声明 / 一并排除。选项与利弊见 `native/tools/fixtures/README.md` | 中 |
-| **T-4** | `flywheel_diffuse.frag` 是 Flywheel 的**逐字副本**。MIT 允许再分发，但需**保留其版权与许可声明**：应在本文件或该夹具头部加上 Flywheel 的 MIT 许可全文与版权行 | **高** |
+| ~~**T-4**~~ | ~~`flywheel_diffuse.frag` 是 Flywheel 的逐字副本，需补版权与许可声明~~ | ✅ **已解决**：三个 Flywheel 夹具均已附 MIT 版权行；逐字副本另附完整许可全文 |
 | **T-5** | 决定 B2 类夹具（来自真机 dump 的 Simulated 完整着色器）的处置方式：保留 / 裁剪为最小构造 / 排除 | 中 |
 | T-3 | 若将来引入任何第三方库，在此文件补记其许可证 | — |
+
+### 4.1 已完成的合规修正记录
+
+| 日期 | 事项 |
+|---|---|
+| 2026-10-09 | 新建 `TEMPLATE_LICENSE.txt`（MDK 的 MIT 许可）。本文件 §1.1 与 `.gitignore` 一直引用它，但**文件此前并不存在**。 |
+| 2026-10-09 | 补记 A2 类（Flywheel 夹具）并附 MIT 版权与许可全文，关闭 T-4。 |
+| 2026-10-09 | 替换 `LICENSE` 为 FSF **当前**官方文本。原文件是旧版排印：三处 URL 仍为 `http://`，且 `why-not-lgpl.html` 的路径已变（旧 `philosophy/`，新 `licenses/`）。这导致 GitHub 的许可证识别返回 `NOASSERTION`（未能匹配任何模板）。**授权内容本身从未改变**，仍是 LGPL-3.0-or-later，只是排印过时。 |
+
 
 ---
 

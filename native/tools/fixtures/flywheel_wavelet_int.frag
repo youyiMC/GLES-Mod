@@ -1,6 +1,14 @@
 #version 460
 
-// Faithful reduction of Engine-Room/Flywheel: flywheel/internal/wavelet.glsl
+// Engine-Room/Flywheel `flywheel/internal/wavelet.glsl` 的忠实还原
+// （faithful reduction）—— 内容源自该文件，非逐字副本。
+//
+//   上游: https://github.com/Engine-Room/Flywheel
+//   许可: MIT License
+//   版权: Copyright (c) 2021-2024 Jozufozu
+//   依 MIT 要求保留版权与许可声明；完整许可全文见同目录
+//   flywheel_int_macro.frag 的文件头。
+//
 // The macro body is a plain integer literal (16). It is used ONLY in integer
 // contexts, but our converter floats the adjacent literals anyway.
 //

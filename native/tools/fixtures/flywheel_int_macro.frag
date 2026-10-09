@@ -1,6 +1,24 @@
 #version 460
 
-// Faithful reduction of Engine-Room/Flywheel: flywheel/internal/wavelet.glsl
+// ===========================================================================
+// 本文件是 Engine-Room/Flywheel `flywheel/internal/wavelet.glsl` 的**忠实还原**
+// （faithful reduction）—— 非逐字副本，但内容源自该文件。
+//
+//   上游: https://github.com/Engine-Room/Flywheel
+//   许可: MIT License
+//   版权: Copyright (c) 2021-2024 Jozufozu
+//
+// 依 MIT 要求保留版权与许可声明：
+//   Copyright (c) 2021-2024 Jozufozu
+//   Permission is hereby granted, free of charge, to any person obtaining a
+//   copy of this software and associated documentation files (the "Software"),
+//   to deal in the Software without restriction, including without limitation
+//   the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//   and/or sell copies of the Software, and to permit persons to whom the
+//   Software is furnished to do so, subject to the following conditions:
+//   The above copyright notice and this permission notice shall be included
+//   in all copies or substantial portions of the Software.
+//   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 //
 // The macro body is a plain integer literal (16), and the macro is used in
 // BOTH integer and float contexts:
