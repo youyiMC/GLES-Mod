@@ -9,11 +9,44 @@ native 共享库（`libgl_gles.so`）。
 
 ## 0. 本项目自身的许可证
 
-glesmod 采用 **LGPL-3.0-or-later**，全文见仓库根目录 [`LICENSE`](LICENSE)。
+glesmod 采用 **LGPL-3.0-or-later**，正文见仓库根目录 [`LICENSE`](LICENSE)。
 
 ```
 SPDX-License-Identifier: LGPL-3.0-or-later
 ```
+
+### 0.1 关于 `LICENSE` 的形态（重要说明）
+
+`LICENSE` 与 **GitHub 官方的 `lgpl-3.0` 识别模板逐字节一致**（7652 字节，
+即 FSF 的 `lgpl-3.0.txt`）。这一点是刻意为之：GitHub 的许可证识别是拿文件内容
+与它自己的模板做匹配的，任何偏离都可能导致仓库被标记为 `NOASSERTION`
+（"找到了 LICENSE 但未识别出"）。
+
+**但请注意**：LGPL-3.0 正文第 3 条是以「并入 GPL-3.0 条款」的方式引用 GPL 的：
+
+> This version of the GNU Lesser General Public License incorporates
+> the terms and conditions of version 3 of the GNU General Public License,
+> supplemented by the additional permissions listed below.
+
+因此**完整的 `LICENSE` 文本实际还需包含 GPL-3.0 全文**。GitHub 的模板只含
+LGPL 正文，这是它的取舍；为兼顾「法律完整性」与「机器可识别」，本项目：
+
+- **`LICENSE`** 采用 GitHub 模板形态（保证 SPDX 被正确识别为 `LGPL-3.0`）；
+- **GPL-3.0 全文**以两种方式提供，任取其一即可获得：
+
+  - 官方原文：<https://www.gnu.org/licenses/gpl-3.0.txt>
+  - 仓库内副本：`licenses/GPL-3.0.txt`
+
+> 如果你更希望 `LICENSE` 直接包含 GPL-3.0 全文（法律上更自足，但会导致
+> GitHub 识别回退为 `NOASSERTION`），可以合并这两份文本 —— 这是**取舍**，
+> 当前选择的是「识别正确」优先。
+
+**一个必须知道的识别局限**：GitHub 的 `lgpl-3.0` 模板只能识别出
+`LGPL-3.0`，**无法区分** `LGPL-3.0-only` 与 `LGPL-3.0-or-later` ——
+因为两者的正文完全相同，差别只在项目如何声明「or later」。
+因此仓库页面上会显示 `LGPL-3.0`，而本项目的**实际授权**是
+`LGPL-3.0-or-later`，以本文件与本仓库各处 `SPDX-License-Identifier` 的
+声明为准。
 
 ---
 
