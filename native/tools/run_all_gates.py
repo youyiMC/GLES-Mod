@@ -124,6 +124,14 @@ def main():
     gates.append(("artifact freshness", rc,
                   "%d 产物 | %s" % (nblob, line_of(out, ["verdict"]))))
 
+    # 11. Documentation facts. Docs drift silently: nobody notices that a figure
+    #     like "20 custom implementations" became wrong until a reader is misled.
+    #     This gate cross-checks the numbers the docs assert against the actual
+    #     source -- it has already caught four stale claims in these guides.
+    rc, out = run([PY, "-X", "utf8",
+                   os.path.join(HERE, "verify_doc_claims.py")])
+    gates.append(("doc facts", rc, line_of(out, ["verdict"])))
+
     print("=" * 74)
     for name, rc, v in gates:
         print("%-16s rc=%-3s %s" % (name, rc, v[:150]))

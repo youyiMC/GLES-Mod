@@ -49,7 +49,7 @@ flowchart LR
 
 | | |
 |---|---|
-| **Native ES 3.2 backend** | 849 exported GL symbols — 345 forwarded, 20 custom implementations, 484 safe stubs. No per-call JNI. |
+| **Native ES 3.2 backend** | 849 exported GL symbols — 339 forwarded, 26 custom implementations, 484 safe stubs. No per-call JNI. |
 | **GLSL → GLSL ES converter** | Desktop GLSL is not GLSL ES. The biggest difference: **desktop GLSL silently converts `int` → `float`, GLSL ES refuses to**. This converter rewrites the source at load time so shaders that work on desktop keep working on ES. It is the single most important component in this project. |
 | **Capability probing & graceful degradation** | Probes what the device actually supports, reports it, and degrades rather than crashing. Missing a feature is a decision, not an accident. |
 | **Sodium / Embeddium aware** | Detects the optimisation mod and its version, and picks a known-good strategy. Unknown versions take a *conservative* path and say so. Never guesses at internals, never mixin-injects into them. |
@@ -171,8 +171,11 @@ Stated plainly, because pretending otherwise helps nobody:
 
 | Document | Contents |
 |---|---|
+| [`docs/DEVELOPER-GUIDE.en.md`](docs/DEVELOPER-GUIDE.en.md) | **Developer guide (English)** — every interface and design decision |
+| [`docs/DEVELOPER-GUIDE.md`](docs/DEVELOPER-GUIDE.md) | **开发者指南（中文）** |
+| [`docs/PLAYER-GUIDE.md`](docs/PLAYER-GUIDE.md) | **玩家手册** — no jargon, no code |
 | [`开发任务书.txt`](开发任务书.txt) | Requirements & decision log (Chinese) |
-| [`docs/architecture.md`](docs/architecture.md) | Architecture and design rationale |
+| [`docs/architecture.md`](docs/architecture.md) | Architecture ⚠️ partially out of date — see §14 of the developer guide |
 | [`docs/capability-interface.md`](docs/capability-interface.md) | Native ↔ Java capability interface |
 | [`docs/test-guide.md`](docs/test-guide.md) | How to reproduce the test suite |
 | [`docs/p2-07-compatibility-matrix.md`](docs/p2-07-compatibility-matrix.md) | Compatibility matrix |
@@ -226,7 +229,7 @@ flowchart LR
 
 | | |
 |---|---|
-| **原生 ES 3.2 后端** | 导出 849 个 GL 符号 —— 345 个转发、20 个定制实现、484 个安全桩。热点路径不经过 JNI。 |
+| **原生 ES 3.2 后端** | 导出 849 个 GL 符号 —— 339 个转发、26 个定制实现、484 个安全桩。热点路径不经过 JNI。 |
 | **GLSL → GLSL ES 转换器** | 桌面 GLSL 不是 GLSL ES。最大的差异是：**桌面 GLSL 允许 `int` → `float` 隐式转换，GLSL ES 不允许**。本转换器在着色器加载时改写源码，让桌面能跑的着色器在 ES 上也能跑。这是本项目最关键的部件。 |
 | **能力探测与优雅降级** | 探测设备真实能力并如实上报；能力不足时降级而不是崩溃。缺功能是一个**经过判断的决定**，不是意外。 |
 | **感知 Sodium / Embeddium** | 识别优化模组及其版本，选择已验证的策略。未知版本走**保守**路径并在日志中说明。绝不猜测其内部实现，也不对其做 Mixin 注入。 |
@@ -339,8 +342,11 @@ py -X utf8 native/tools/run_all_gates.py
 
 | 文档 | 内容 |
 |---|---|
+| [`docs/DEVELOPER-GUIDE.md`](docs/DEVELOPER-GUIDE.md) | **开发者指南（中文）** —— 全部接口与设计决策 |
+| [`docs/DEVELOPER-GUIDE.en.md`](docs/DEVELOPER-GUIDE.en.md) | **Developer guide (English)** |
+| [`docs/PLAYER-GUIDE.md`](docs/PLAYER-GUIDE.md) | **玩家手册** —— 不含术语，不涉及代码 |
 | [`开发任务书.txt`](开发任务书.txt) | 需求与决策记录 |
-| [`docs/architecture.md`](docs/architecture.md) | 架构与设计依据 |
+| [`docs/architecture.md`](docs/architecture.md) | 架构 ⚠️ 已部分过时 —— 见开发者指南 §14 |
 | [`docs/capability-interface.md`](docs/capability-interface.md) | 原生 ↔ Java 能力接口 |
 | [`docs/test-guide.md`](docs/test-guide.md) | 如何复现测试 |
 | [`docs/p2-07-compatibility-matrix.md`](docs/p2-07-compatibility-matrix.md) | 兼容矩阵 |
