@@ -1,0 +1,403 @@
+{
+  "source": "C:\\Users\\youyi\\.gradle\\caches\\neoformruntime\\artifacts\\minecraft_1.21.1_client.jar",
+  "classes_scanned": 8269,
+  "classes_failed": 0,
+  "gl_binding_classes_used": {
+    "GL11": "1.1",
+    "GL13": "1.3",
+    "GL14": "1.4",
+    "GL15": "1.5",
+    "GL20": "2.0",
+    "GL30": "3.0"
+  },
+  "total_distinct_symbols": 89,
+  "in_gl_32_core": 84,
+  "beyond_gl_32_core": [
+    "glDrawPixels",
+    "glGetInteger",
+    "glGetProgrami",
+    "glGetShaderi",
+    "glGetTexLevelParameteri"
+  ],
+  "in_gles_32_direct": 79,
+  "need_extra_work": [
+    "glClearDepth",
+    "glGetTexImage",
+    "glLogicOp",
+    "glMapBuffer",
+    "glPolygonMode"
+  ],
+  "by_class": {
+    "GL11": [
+      "glBindTexture",
+      "glBlendFunc",
+      "glClear",
+      "glClearColor",
+      "glClearDepth",
+      "glClearStencil",
+      "glColorMask",
+      "glDeleteTextures",
+      "glDepthFunc",
+      "glDepthMask",
+      "glDisable",
+      "glDrawElements",
+      "glDrawPixels",
+      "glEnable",
+      "glGenTextures",
+      "glGetError",
+      "glGetInteger",
+      "glGetString",
+      "glGetTexImage",
+      "glGetTexLevelParameteri",
+      "glLogicOp",
+      "glPixelStorei",
+      "glPolygonMode",
+      "glPolygonOffset",
+      "glReadPixels",
+      "glStencilFunc",
+      "glStencilMask",
+      "glStencilOp",
+      "glTexImage2D",
+      "glTexParameterf",
+      "glTexParameteri",
+      "glTexSubImage2D",
+      "glViewport"
+    ],
+    "GL13": [
+      "glActiveTexture"
+    ],
+    "GL14": [
+      "glBlendEquation",
+      "glBlendFuncSeparate"
+    ],
+    "GL15": [
+      "glBindBuffer",
+      "glBufferData",
+      "glDeleteBuffers",
+      "glGenBuffers",
+      "glMapBuffer",
+      "glUnmapBuffer"
+    ],
+    "GL20": [
+      "glAttachShader",
+      "glBindAttribLocation",
+      "glCompileShader",
+      "glCopyTexSubImage2D",
+      "glCreateProgram",
+      "glCreateShader",
+      "glDeleteProgram",
+      "glDeleteShader",
+      "glDisableVertexAttribArray",
+      "glEnableVertexAttribArray",
+      "glGetAttribLocation",
+      "glGetProgramInfoLog",
+      "glGetProgrami",
+      "glGetShaderInfoLog",
+      "glGetShaderi",
+      "glGetUniformLocation",
+      "glLinkProgram",
+      "glScissor",
+      "glUniform1fv",
+      "glUniform1i",
+      "glUniform1iv",
+      "glUniform2fv",
+      "glUniform2iv",
+      "glUniform3fv",
+      "glUniform3iv",
+      "glUniform4fv",
+      "glUniform4iv",
+      "glUniformMatrix2fv",
+      "glUniformMatrix3fv",
+      "glUniformMatrix4fv",
+      "glUseProgram",
+      "glVertexAttribPointer"
+    ],
+    "GL30": [
+      "glBindFramebuffer",
+      "glBindRenderbuffer",
+      "glBindVertexArray",
+      "glBlitFramebuffer",
+      "glCheckFramebufferStatus",
+      "glDeleteFramebuffers",
+      "glDeleteRenderbuffers",
+      "glDeleteVertexArrays",
+      "glFramebufferRenderbuffer",
+      "glFramebufferTexture2D",
+      "glGenFramebuffers",
+      "glGenRenderbuffers",
+      "glGenVertexArrays",
+      "glRenderbufferStorage",
+      "glVertexAttribIPointer"
+    ]
+  },
+  "callers": {
+    "glActiveTexture": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glAttachShader": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glBindAttribLocation": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glBindBuffer": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glBindFramebuffer": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glBindRenderbuffer": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glBindTexture": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glBindVertexArray": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glBlendEquation": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glBlendFunc": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glBlendFuncSeparate": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glBlitFramebuffer": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glBufferData": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glCheckFramebufferStatus": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glClear": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glClearColor": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glClearDepth": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glClearStencil": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glColorMask": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glCompileShader": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glCopyTexSubImage2D": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glCreateProgram": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glCreateShader": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glDeleteBuffers": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glDeleteFramebuffers": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glDeleteProgram": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glDeleteRenderbuffers": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glDeleteShader": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glDeleteTextures": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glDeleteVertexArrays": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glDepthFunc": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glDepthMask": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glDisable": [
+      "com.mojang.blaze3d.platform.GlStateManager$b"
+    ],
+    "glDisableVertexAttribArray": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glDrawElements": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glDrawPixels": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glEnable": [
+      "com.mojang.blaze3d.platform.GlStateManager$b",
+      "fab"
+    ],
+    "glEnableVertexAttribArray": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glFramebufferRenderbuffer": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glFramebufferTexture2D": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glGenBuffers": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glGenFramebuffers": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glGenRenderbuffers": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glGenTextures": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glGenVertexArrays": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glGetAttribLocation": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glGetError": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glGetInteger": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glGetProgramInfoLog": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glGetProgrami": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glGetShaderInfoLog": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glGetShaderi": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glGetString": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glGetTexImage": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glGetTexLevelParameteri": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glGetUniformLocation": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glLinkProgram": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glLogicOp": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glMapBuffer": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glPixelStorei": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glPolygonMode": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glPolygonOffset": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glReadPixels": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glRenderbufferStorage": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glScissor": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glStencilFunc": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glStencilMask": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glStencilOp": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glTexImage2D": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glTexParameterf": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glTexParameteri": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glTexSubImage2D": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glUniform1fv": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glUniform1i": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glUniform1iv": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glUniform2fv": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glUniform2iv": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glUniform3fv": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glUniform3iv": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glUniform4fv": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glUniform4iv": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glUniformMatrix2fv": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glUniformMatrix3fv": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glUniformMatrix4fv": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glUnmapBuffer": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glUseProgram": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glVertexAttribIPointer": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glVertexAttribPointer": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ],
+    "glViewport": [
+      "com.mojang.blaze3d.platform.GlStateManager"
+    ]
+  }
+}

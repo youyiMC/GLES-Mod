@@ -1,0 +1,81 @@
+# ==========================================================================
+# glesmod -- .gitattributes
+#
+# 目的：让仓库在任何平台上都以**同一份字节**检出，避免"整文件变更"的噪声，
+# 也避免二进制文件被行尾转换损坏。
+#
+# 采用的做法是「在仓库里一律存 LF」，由 Git 在检出时按平台转换。
+#
+# ⚠️ 注意：本项目**不假设**源文件的行尾。转换器（native/src/shader.c）
+#    内部对 '\r' 有显式处理，因此 CRLF 输入也能正确工作；
+#    这里统一行尾是为了仓库整洁，不是功能需要。
+#
+# LGPL-3.0-or-later
+# ==========================================================================
+
+# ---- 默认：自动判定文本，仓库内存 LF ------------------------------------
+* text=auto eol=lf
+
+# ---- 明确是二进制，绝不做行尾转换 ---------------------------------------
+*.jar   binary
+*.zip   binary
+*.apk   binary
+*.so    binary
+*.dll   binary
+*.dylib binary
+*.a     binary
+*.o     binary
+*.class binary
+*.dex   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.spv   binary
+*.keystore binary
+*.jks   binary
+*.p12   binary
+*.pfx   binary
+
+# ---- 文本文件显式声明（LF）----------------------------------------------
+*.c      text eol=lf
+*.h      text eol=lf
+*.java   text eol=lf
+*.gradle text eol=lf
+*.properties text eol=lf
+*.json   text eol=lf
+*.toml   text eol=lf
+*.xml    text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
+*.md     text eol=lf
+*.txt    text eol=lf
+*.glsl   text eol=lf
+*.frag   text eol=lf
+*.vert   text eol=lf
+*.vsh    text eol=lf
+*.fsh    text eol=lf
+*.comp   text eol=lf
+*.py     text eol=lf
+*.def    text eol=lf
+
+# PowerShell 脚本同样用 LF：PowerShell 5.1 与 7+ 都能正确读取 LF。
+# 真正的坑不是行尾而是**编码** —— .ps1 必须保持纯 ASCII，
+# 因为 PS 5.1 在 zh-CN 下按 GBK 解码脚本文件（见 build-all.ps1 顶部说明）。
+*.ps1    text eol=lf
+
+# ---- 例外：Windows 批处理需要 CRLF --------------------------------------
+*.bat    text eol=crlf
+*.cmd    text eol=crlf
+
+# ---- 生成文件（沿用 MDK 模板的约定）------------------------------------
+# Disable autocrlf on generated files, they always generate with LF
+# Add any extra files or paths here to make git stop saying they
+# are changed when only line endings change.
+src/generated/**/.cache/* text eol=lf
+src/generated/**/*.json text eol=lf
+
+# ---- 语言统计：不让文档与工具脚本淹没真正的产品代码 --------------------
+docs/**        linguist-documentation
+native/tools/** linguist-vendored=false

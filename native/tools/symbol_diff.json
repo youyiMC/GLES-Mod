@@ -1,0 +1,486 @@
+{
+  "source": "Khronos OpenGL-Registry gl.xml",
+  "gl_symbols": 316,
+  "gles_symbols": 358,
+  "common": 234,
+  "gl_only": 82,
+  "buckets": {
+    "forward": {
+      "count": 234,
+      "meaning": "同名同义，直接转发（零成本）"
+    },
+    "map": {
+      "count": 76,
+      "meaning": "需映射到其他 GLES 调用"
+    },
+    "unsupported": {
+      "count": 5,
+      "meaning": "需仿真或降级"
+    },
+    "unknown": {
+      "count": 1,
+      "meaning": "未分类，需人工复核"
+    }
+  },
+  "forward_percent": 74.1,
+  "workload_percent": 25.9,
+  "details": {
+    "mappable": [
+      {
+        "name": "glBeginConditionalRender",
+        "plan": "→ 需用 GL_ANY_SAMPLES_PASSED 间接实现或降级"
+      },
+      {
+        "name": "glBindFragDataLocation",
+        "plan": "→ 着色器转换时改写为 layout(location=N) out"
+      },
+      {
+        "name": "glClampColor",
+        "plan": "→ 忽略（ES 无颜色钳制控制）"
+      },
+      {
+        "name": "glClearDepth",
+        "plan": "→ glClearDepthf（double 转 float）"
+      },
+      {
+        "name": "glCompressedTexImage1D",
+        "plan": "→ glCompressedTexImage2D（height=1）"
+      },
+      {
+        "name": "glCompressedTexSubImage1D",
+        "plan": "→ glCompressedTexSubImage2D（height=1）"
+      },
+      {
+        "name": "glCopyTexImage1D",
+        "plan": "→ glCopyTexImage2D（height=1）"
+      },
+      {
+        "name": "glCopyTexSubImage1D",
+        "plan": "→ glCopyTexSubImage2D（height=1）"
+      },
+      {
+        "name": "glDepthRange",
+        "plan": "→ glDepthRangef（double 转 float）"
+      },
+      {
+        "name": "glEndConditionalRender",
+        "plan": "→ 同上"
+      },
+      {
+        "name": "glFramebufferTexture1D",
+        "plan": "→ glFramebufferTexture2D（height=1）"
+      },
+      {
+        "name": "glFramebufferTexture3D",
+        "plan": "→ glFramebufferTextureLayer 或 2D 数组"
+      },
+      {
+        "name": "glGetActiveUniformName",
+        "plan": "→ glGetActiveUniform + glGetUniformName（ES 无此入口）"
+      },
+      {
+        "name": "glGetBufferSubData",
+        "plan": "→ glMapBufferRange + memcpy + glUnmapBuffer"
+      },
+      {
+        "name": "glGetCompressedTexImage",
+        "plan": "→ 无直接对应，需 FBO 回读或降级"
+      },
+      {
+        "name": "glGetDoublev",
+        "plan": "→ glGetFloatv（double 转 float）"
+      },
+      {
+        "name": "glGetQueryObjectiv",
+        "plan": "→ glGetQueryObjectuiv（ES 3.0+）"
+      },
+      {
+        "name": "glGetVertexAttribdv",
+        "plan": "→ glGetVertexAttribfv"
+      },
+      {
+        "name": "glMapBuffer",
+        "plan": "→ glMapBufferRange（offset=0, length=全量）"
+      },
+      {
+        "name": "glMultiDrawArrays",
+        "plan": "→ 循环 glDrawArrays（降级，计入 DegradeReason）"
+      },
+      {
+        "name": "glMultiDrawElements",
+        "plan": "→ 循环 glDrawElements（降级，Sodium 会受影响）"
+      },
+      {
+        "name": "glMultiDrawElementsBaseVertex",
+        "plan": "→ 循环 glDrawElementsBaseVertex"
+      },
+      {
+        "name": "glPixelStoref",
+        "plan": "→ glPixelStorei（浮点值取整）"
+      },
+      {
+        "name": "glPointParameterf",
+        "plan": "→ 忽略或转 gl_PointSize 着色器写入"
+      },
+      {
+        "name": "glPointParameterfv",
+        "plan": "→ 忽略或转 gl_PointSize 着色器写入"
+      },
+      {
+        "name": "glPointParameteri",
+        "plan": "→ 忽略（ES 无点精灵坐标原点切换）"
+      },
+      {
+        "name": "glPointParameteriv",
+        "plan": "→ 忽略"
+      },
+      {
+        "name": "glPrimitiveRestartIndex",
+        "plan": "→ glPrimitiveRestartIndex（ES 3.0+ 有同名入口）"
+      },
+      {
+        "name": "glProvokingVertex",
+        "plan": "→ 忽略或依赖 GL_LAST_VERTEX_CONVENTION 扩展"
+      },
+      {
+        "name": "glTexImage1D",
+        "plan": "→ glTexImage2D（height=1）"
+      },
+      {
+        "name": "glTexImage2DMultisample",
+        "plan": "→ glTexStorage2DMultisample 或降级为非 MSAA"
+      },
+      {
+        "name": "glTexImage3DMultisample",
+        "plan": "→ glTexStorage3DMultisample 或降级为非 MSAA"
+      },
+      {
+        "name": "glTexSubImage1D",
+        "plan": "→ glTexSubImage2D（height=1）"
+      },
+      {
+        "name": "glVertexAttrib1d",
+        "plan": "→ glVertexAttrib1f（double 转 float）"
+      },
+      {
+        "name": "glVertexAttrib1dv",
+        "plan": "→ glVertexAttrib1fv"
+      },
+      {
+        "name": "glVertexAttrib1s",
+        "plan": "→ glVertexAttrib1f（short 转 float）"
+      },
+      {
+        "name": "glVertexAttrib1sv",
+        "plan": "→ glVertexAttrib1fv"
+      },
+      {
+        "name": "glVertexAttrib2d",
+        "plan": "→ glVertexAttrib2f"
+      },
+      {
+        "name": "glVertexAttrib2dv",
+        "plan": "→ glVertexAttrib2fv"
+      },
+      {
+        "name": "glVertexAttrib2s",
+        "plan": "→ glVertexAttrib2f"
+      },
+      {
+        "name": "glVertexAttrib2sv",
+        "plan": "→ glVertexAttrib2fv"
+      },
+      {
+        "name": "glVertexAttrib3d",
+        "plan": "→ glVertexAttrib3f"
+      },
+      {
+        "name": "glVertexAttrib3dv",
+        "plan": "→ glVertexAttrib3fv"
+      },
+      {
+        "name": "glVertexAttrib3s",
+        "plan": "→ glVertexAttrib3f"
+      },
+      {
+        "name": "glVertexAttrib3sv",
+        "plan": "→ glVertexAttrib3fv"
+      },
+      {
+        "name": "glVertexAttrib4Nbv",
+        "plan": "→ glVertexAttrib4Nubv"
+      },
+      {
+        "name": "glVertexAttrib4Niv",
+        "plan": "→ glVertexAttrib4Niv（ES 支持）"
+      },
+      {
+        "name": "glVertexAttrib4Nsv",
+        "plan": "→ glVertexAttrib4Nsv（ES 支持）"
+      },
+      {
+        "name": "glVertexAttrib4Nub",
+        "plan": "→ glVertexAttrib4f（归一化后转换）"
+      },
+      {
+        "name": "glVertexAttrib4Nubv",
+        "plan": "→ glVertexAttrib4Nubv（ES 支持）"
+      },
+      {
+        "name": "glVertexAttrib4Nuiv",
+        "plan": "→ glVertexAttribI4uiv（归一化）"
+      },
+      {
+        "name": "glVertexAttrib4Nusv",
+        "plan": "→ glVertexAttribI4usv（归一化）"
+      },
+      {
+        "name": "glVertexAttrib4bv",
+        "plan": "→ glVertexAttribI4bv / glVertexAttrib4Nubv"
+      },
+      {
+        "name": "glVertexAttrib4d",
+        "plan": "→ glVertexAttrib4f"
+      },
+      {
+        "name": "glVertexAttrib4dv",
+        "plan": "→ glVertexAttrib4fv"
+      },
+      {
+        "name": "glVertexAttrib4iv",
+        "plan": "→ glVertexAttribI4iv"
+      },
+      {
+        "name": "glVertexAttrib4s",
+        "plan": "→ glVertexAttrib4f"
+      },
+      {
+        "name": "glVertexAttrib4sv",
+        "plan": "→ glVertexAttrib4fv"
+      },
+      {
+        "name": "glVertexAttrib4uiv",
+        "plan": "→ glVertexAttribI4uiv"
+      },
+      {
+        "name": "glVertexAttrib4usv",
+        "plan": "→ glVertexAttribI4usv"
+      },
+      {
+        "name": "glVertexAttribI1i",
+        "plan": "→ 拆分为向量变体 glVertexAttribI4i"
+      },
+      {
+        "name": "glVertexAttribI1iv",
+        "plan": "→ glVertexAttribI4iv"
+      },
+      {
+        "name": "glVertexAttribI1ui",
+        "plan": "→ glVertexAttribI4ui"
+      },
+      {
+        "name": "glVertexAttribI1uiv",
+        "plan": "→ glVertexAttribI4uiv"
+      },
+      {
+        "name": "glVertexAttribI2i",
+        "plan": "→ glVertexAttribI4i"
+      },
+      {
+        "name": "glVertexAttribI2iv",
+        "plan": "→ glVertexAttribI4iv"
+      },
+      {
+        "name": "glVertexAttribI2ui",
+        "plan": "→ glVertexAttribI4ui"
+      },
+      {
+        "name": "glVertexAttribI2uiv",
+        "plan": "→ glVertexAttribI4uiv"
+      },
+      {
+        "name": "glVertexAttribI3i",
+        "plan": "→ glVertexAttribI4i"
+      },
+      {
+        "name": "glVertexAttribI3iv",
+        "plan": "→ glVertexAttribI4iv"
+      },
+      {
+        "name": "glVertexAttribI3ui",
+        "plan": "→ glVertexAttribI4ui"
+      },
+      {
+        "name": "glVertexAttribI3uiv",
+        "plan": "→ glVertexAttribI4uiv"
+      },
+      {
+        "name": "glVertexAttribI4bv",
+        "plan": "→ glVertexAttribI4iv（byte 转 int）"
+      },
+      {
+        "name": "glVertexAttribI4sv",
+        "plan": "→ glVertexAttribI4iv（short 转 int）"
+      },
+      {
+        "name": "glVertexAttribI4ubv",
+        "plan": "→ glVertexAttribI4uiv"
+      },
+      {
+        "name": "glVertexAttribI4usv",
+        "plan": "→ glVertexAttribI4uiv"
+      }
+    ],
+    "unsupported": [
+      {
+        "name": "glDrawBuffer",
+        "plan": "ES 无单缓冲选择。用 glDrawBuffers 替代"
+      },
+      {
+        "name": "glGetTexImage",
+        "plan": "ES 无。需用 glReadPixels 或 FBO 回读"
+      },
+      {
+        "name": "glLogicOp",
+        "plan": "ES 无逻辑运算。需降级为混合或忽略"
+      },
+      {
+        "name": "glPointSize",
+        "plan": "ES 无 glPointSize。可用着色器 gl_PointSize 替代"
+      },
+      {
+        "name": "glPolygonMode",
+        "plan": "ES 无面模式（wireframe）。仅 GL_FILL 可忽略，其他需降级"
+      }
+    ],
+    "unknown": [
+      "glVertexAttrib4ubv"
+    ],
+    "gles_only": [
+      "glActiveShaderProgram",
+      "glBindImageTexture",
+      "glBindProgramPipeline",
+      "glBindSampler",
+      "glBindTransformFeedback",
+      "glBindVertexBuffer",
+      "glBlendBarrier",
+      "glBlendEquationSeparatei",
+      "glBlendEquationi",
+      "glBlendFuncSeparatei",
+      "glBlendFunci",
+      "glClearDepthf",
+      "glCopyImageSubData",
+      "glCreateShaderProgramv",
+      "glDebugMessageCallback",
+      "glDebugMessageControl",
+      "glDebugMessageInsert",
+      "glDeleteProgramPipelines",
+      "glDeleteSamplers",
+      "glDeleteTransformFeedbacks",
+      "glDepthRangef",
+      "glDispatchCompute",
+      "glDispatchComputeIndirect",
+      "glDrawArraysIndirect",
+      "glDrawElementsIndirect",
+      "glFramebufferParameteri",
+      "glGenProgramPipelines",
+      "glGenSamplers",
+      "glGenTransformFeedbacks",
+      "glGetDebugMessageLog",
+      "glGetFramebufferParameteriv",
+      "glGetGraphicsResetStatus",
+      "glGetInternalformativ",
+      "glGetObjectLabel",
+      "glGetObjectPtrLabel",
+      "glGetPointerv",
+      "glGetProgramBinary",
+      "glGetProgramInterfaceiv",
+      "glGetProgramPipelineInfoLog",
+      "glGetProgramPipelineiv",
+      "glGetProgramResourceIndex",
+      "glGetProgramResourceLocation",
+      "glGetProgramResourceName",
+      "glGetProgramResourceiv",
+      "glGetSamplerParameterIiv",
+      "glGetSamplerParameterIuiv",
+      "glGetSamplerParameterfv",
+      "glGetSamplerParameteriv",
+      "glGetShaderPrecisionFormat",
+      "glGetnUniformfv",
+      "glGetnUniformiv",
+      "glGetnUniformuiv",
+      "glInvalidateFramebuffer",
+      "glInvalidateSubFramebuffer",
+      "glIsProgramPipeline",
+      "glIsSampler",
+      "glIsTransformFeedback",
+      "glMemoryBarrier",
+      "glMemoryBarrierByRegion",
+      "glMinSampleShading",
+      "glObjectLabel",
+      "glObjectPtrLabel",
+      "glPatchParameteri",
+      "glPauseTransformFeedback",
+      "glPopDebugGroup",
+      "glPrimitiveBoundingBox",
+      "glProgramBinary",
+      "glProgramParameteri",
+      "glProgramUniform1f",
+      "glProgramUniform1fv",
+      "glProgramUniform1i",
+      "glProgramUniform1iv",
+      "glProgramUniform1ui",
+      "glProgramUniform1uiv",
+      "glProgramUniform2f",
+      "glProgramUniform2fv",
+      "glProgramUniform2i",
+      "glProgramUniform2iv",
+      "glProgramUniform2ui",
+      "glProgramUniform2uiv",
+      "glProgramUniform3f",
+      "glProgramUniform3fv",
+      "glProgramUniform3i",
+      "glProgramUniform3iv",
+      "glProgramUniform3ui",
+      "glProgramUniform3uiv",
+      "glProgramUniform4f",
+      "glProgramUniform4fv",
+      "glProgramUniform4i",
+      "glProgramUniform4iv",
+      "glProgramUniform4ui",
+      "glProgramUniform4uiv",
+      "glProgramUniformMatrix2fv",
+      "glProgramUniformMatrix2x3fv",
+      "glProgramUniformMatrix2x4fv",
+      "glProgramUniformMatrix3fv",
+      "glProgramUniformMatrix3x2fv",
+      "glProgramUniformMatrix3x4fv",
+      "glProgramUniformMatrix4fv",
+      "glProgramUniformMatrix4x2fv",
+      "glProgramUniformMatrix4x3fv",
+      "glPushDebugGroup",
+      "glReadnPixels",
+      "glReleaseShaderCompiler",
+      "glResumeTransformFeedback",
+      "glSamplerParameterIiv",
+      "glSamplerParameterIuiv",
+      "glSamplerParameterf",
+      "glSamplerParameterfv",
+      "glSamplerParameteri",
+      "glSamplerParameteriv",
+      "glShaderBinary",
+      "glTexBufferRange",
+      "glTexStorage2D",
+      "glTexStorage2DMultisample",
+      "glTexStorage3D",
+      "glTexStorage3DMultisample",
+      "glUseProgramStages",
+      "glValidateProgramPipeline",
+      "glVertexAttribBinding",
+      "glVertexAttribDivisor",
+      "glVertexAttribFormat",
+      "glVertexAttribIFormat",
+      "glVertexBindingDivisor"
+    ]
+  }
+}

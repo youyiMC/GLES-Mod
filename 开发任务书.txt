@@ -1,0 +1,495 @@
+# 开发任务书：GLES 渲染后端模组（暂定名 GLES Mod）
+
+> ## 修订记录
+>
+> ### v2（2026-09-25）
+>
+> 本版修正 v1 中的平台与依赖错误，并固化第二轮评审已拍板的决策。
+>
+> | 项 | v1（错误／待定） | v2（当前基线） | 原因 |
+> |---|---|---|---|
+> | 模组平台 | Fabric | **NeoForge** | v1 与工作区实际模板不符，已确认为笔误 |
+> | Minecraft | 1.20.1 | **1.21.1** | 随平台修正 |
+> | Java | 未指定 | **Java 21** | 1.21.1 官方运行时要求 |
+> | 映射 | 未指定 | **Parchment 2024.11.17** | 沿用工程模板 |
+> | 启动器 | PojavLauncher 优先 | **FCL 优先，兼容 Pojav 分支** | PojavLauncher 已于 2025-09-23 归档为只读 |
+> | Sodium 版本 | 0.5.x（P2-03）与 ≥0.8.x（验收）互斥 | **0.8.13-neoforge（1.21.1）** | 已核实存在 `mc1.21.1-0.8.13-neoforge` 产物 |
+> | NeoForge 侧优化模组 | Rubidium（Forge 侧） | **Embeddium** | Rubidium 为 Forge 1.20.1 专用，NeoForge 侧对应物为 Embeddium |
+> | 渲染重定向路线 | Mixin → JNI 转发 | **Native 层实现（C/C++），参考 MobileGlues / NG-GL4ES 思路自研** | 纯 Mixin + JNI 在热点路径上每次调用跨一次 JNI，性能上限低于 native 实现 |
+> | 交付形态 | 仅游戏模组 | **NeoForge 模组（主）+ FCL 渲染器插件（可选增强）** | 模组保证跨启动器通用性；FCL 插件走官方集成点以争取更高性能 |
+> | 包名 | `io.github.<user>.gles` | **`com.youyimc.glesmod`** | 沿用现有工程 `mod_group_id` |
+> | 许可证 | 「LGPL 或 Apache 2.0」自相矛盾 | **LGPL-3.0-or-later** | 与验收标准第 7 条一致 |
+> | 着色器转换 | 未明确责任方 | **优先复用现有转换能力，仅在必要时自研** | 自研完整 GLSL→GLSL ES 转换器成本极高且收益有限 |
+>
+> 尚未闭环的事项统一记录在 §12。
+>
+> ### v3（2026-09-25）第二轮评审结论
+>
+> **O-01 已闭环：库替换方案成立，且比预期简单得多。**
+>
+> 已核实 FCL 源码，其渲染器机制本质就是 `dlopen` 一个 GL 库：
+>
+> ```java
+> // FCL/src/main/java/com/tungsten/fclauncher/FCLauncher.java
+> bridge.dlopen(RendererPlugin.getSelected().getPath() + "/" + RendererPlugin.getSelected().getEglName());
+> // 或内置渲染器：
+> bridge.dlopen(nativeDir + "/" + config.getRenderer().getGlName());
+> ```
+>
+> 对应的 `RendererConfigV2`（插件 APK 内 `@string/config` 资源中的 JSON）：
+>
+> ```kotlin
+> data class RendererConfigV2(
+>     val displayName: String,
+>     val rendererId: String,
+>     val rendererGLPath: String,       // 本项目提供的 libGL.so 填这里
+>     val rendererEGLPath: String,      // 复用现有 EGL，不接管
+>     val dlopenLibPaths: List<String> = emptyList(),
+>     val env: List<EnvV2> = emptyList(),
+>     val minMCVer: String? = null,
+>     val maxMCVer: String? = null,
+> )
+> ```
+>
+> 结论：**不需要 LD_PRELOAD，不需要 inline hook，不需要修改启动器。** 本项目实现天然就是 FCL 的一个渲染器插件。
+>
+> ⚠️ 关于「无法完全关闭渲染器」的澄清：FCL 的「OpenGL 实现方式」不是可关闭的装饰层，而是**进程级 GL 库的绑定点**——不提供 GL 实现则 LWJGL 连符号都无法解析，游戏无法启动。因此正确做法不是「关闭渲染器让 mod 接管」，而是**让本项目的实现本身成为那个渲染器**。
+>
+> 其余新增决策：
+>
+> | 项 | 决策 | 理由 |
+> |---|---|---|
+> | 着色器兼容 | **尽最大努力兼容，无法兼容则降级**（不崩溃） | 用户明确要求；对应 §6 的 B+A 组合方案 |
+> | EGL 接管范围 | **只提供 GL，复用现有 EGL** | 符合非目标；避免与 ANGLE 叠加造成双重翻译 |
+> | 插件与 mod 关系 | **单仓多产物**：一份 native 核心 + FCL 插件 APK + NeoForge mod jar | native 逻辑只写一份，差异仅在包装层 |
+> | FCL 插件时机 | **提前到阶段一并行**（原为阶段三 P3-07） | 插件路径性能优势明显，提前验证能更早暴露问题 |
+> | Pojav 支持 | **降至阶段四** | Pojav 主仓库已归档，渲染器为 `Renderer.ID_*` 硬编码枚举，不支持动态插件 |
+>
+> **新增待验证项**：需实机确认 FCL 当前的 EGL 实现是否为 ANGLE。若是，则其 GLES 输出会再经 ANGLE 翻译一层，需相应调整策略。
+>
+> ### v4（2026-09-25）O-08 闭环：FCL 的 EGL 实现已核实
+>
+> 已阅读 FCL 源码确认其 EGL 机制，**不存在双重翻译风险**。
+>
+> `FCL/src/main/jni/ctxbridges/egl_loader.c` 的 `dlsym_EGL()`：
+>
+> ```c
+> char* eglName = (strncmp(gles ? gles : "", "libGLESv2_angle.so", 18) == 0)
+>                 ? "libEGL_angle.so"          /* 仅当显式指定 ANGLE 时 */
+>                 : getenv("POJAVEXEC_EGL");   /* 否则由渲染器决定 */
+> void* dl_handle = loader_dlopen(eglName, "libEGL.so", RTLD_LOCAL|RTLD_LAZY);
+> /*                                          ^^^^^^^^^^^ 兜底 */
+> ```
+>
+> **6 个内置渲染器中，5 个使用系统 `libEGL.so`，Zink 使用 `libEGL_mesa.so`；无一个使用 ANGLE。** 二者均为厂商/系统 EGL 实现（直接对接 GLES 驱动），非翻译层。
+>
+> 因此链路为：
+>
+> ```
+> 我们的 libgl_gles.so（桌面 GL → ES 3.x 映射）
+>     ↓ 输出原生 ES 调用
+> 系统 libEGL.so + 厂商 GLES 驱动（原生执行）
+> ```
+>
+> **结论：「不接管 EGL」的决策成立，无需修改。**
+>
+> ⚠️ **但发现一个必须处理的隐患（O-09）**：FCL 对内置渲染器会设置 `LIBGL_ES`（决定 EGL 上下文版本），但对**插件渲染器不设置**（`addRendererEnvInner()` 在插件分支直接 `return`）。而 `gl_bridge.c` 会读取它：
+>
+> ```c
+> int libgl_es = strtol(getenv("LIBGL_ES"), NULL, 0);
+> const EGLint egl_context_attributes[] = {EGL_CONTEXT_CLIENT_VERSION, libgl_es, EGL_NONE};
+> ```
+>
+> **要求（P1-05）**：必须在插件 env 中显式声明 `LIBGL_ES=3`（作为 `NormalEnv`）。
+>
+> 另已确认 GL 库的加载方式：`FCLauncher` 会 `bridge.dlopen(getGLPath())` 预加载，Android 11 以下通过 `RENDERER_HANDLE` 环境变量向 LWJGL 的 `ndlopen` hook 传递句柄（插件路径含 `plugin` 字符串）。**因此本项目的库必须导出完整 GL 符号集**。
+
+---
+
+**目标**：为移动端 Minecraft Java 版开发一个 OpenGL ES 渲染后端模组，优先在 Android + NeoForge 1.21.1 + 原版/JEI 环境跑通，并通过软依赖兼容 Sodium（NeoForge 侧）/ Embeddium，实现自动检测、能力协商与功能降级。
+
+---
+
+## 1. 背景与目标
+
+当前移动端 Java 版依赖 GL4ES/ANGLE 等兼容层，将桌面 OpenGL 翻译为 OpenGL ES，存在 CPU 开销大、帧生成不稳、部分模组兼容差的问题。本项目目标是开发一个**原生 OpenGL ES 渲染后端模组**，直接使用移动 GPU 的 ES 3.2 API，替代兼容层的高频渲染路径。
+
+**核心策略**：不重写 Minecraft 渲染引擎，不替代 Sodium，而是作为“渲染后端适配层”，让原版和 Sodium 等优化模组在 ES 环境下**能跑、能降级、不崩溃**。
+
+**主要场景**：近似原版 + JEI 等轻量辅助模组。  
+**扩展目标**：软依赖联动 Sodium / Embeddium，自动禁用或降级无法在 ES 上运行的功能。
+
+---
+
+## 2. 范围与非目标
+
+### 范围内
+- Android 优先，目标 API：**OpenGL ES 3.2**，可选回退 ES 3.0。
+- Minecraft **1.21.1 + NeoForge**，Java 21。
+- 启动器：优先 **FCL（Fold Craft Launcher）**，兼容 PojavLauncher 及其分支（Amethyst-Android、ZalithLauncher 等）。
+- 原版世界渲染、GUI、JEI 界面。
+- 高频 GL 调用通过 **native 层实现**重定向到原生 GLES。
+- 着色器从桌面 GLSL 转换为 **GLSL ES 320**（优先复用现有转换能力，见 §12）。
+- 软依赖检测 Sodium / Embeddium，能力协商与降级路由。
+- 剔除、粒子渲染控制、实例化渲染的 ES 适配。
+- **FCL 渲染器插件**入口（可选增强路径，不在 MVP 范围）。
+- 开源、可 fork、文档完整。
+
+### 非目标
+- 不实现完整 Vulkan 后端。
+- 不追求光影、高级着色器、计算着色器全功能。
+- 不修改 Minecraft 本体，不分发游戏资源。
+- 不承诺初期性能超越 GL4ES。
+- 不保证所有 Sodium 版本、所有设备完美运行。
+- 不自行创建窗口/EGL 上下文；使用启动器已创建的上下文。
+- **native 库不接管 EGL**，只提供 GL；EGL 复用启动器现有实现。
+- 不重写完整的 GLSL → GLSL ES 转换器（优先复用兼容层已有能力）。
+- **着色器兼容为「尽最大努力」而非「保证全覆盖」**：无法转换的着色器记降级事件并交回模组处理，不使游戏崩溃。
+- **阶段四之前不保证 Pojav 主仓库（已归档）可用**。
+
+---
+
+## 3. 目标环境与约束
+
+| 项目 | 要求 |
+|---|---|
+| GPU | 骁龙 835 及以上，Adreno 540 / Mali-G72 及以上 |
+| OpenGL ES | 目标 3.2，最低 3.0 |
+| 系统 | Android 8+ |
+| MC | 1.21.1 + NeoForge 21.1.x |
+| Java | Java 21 |
+| 启动器 | FCL 优先（渲染器插件路径）；Pojav 分支阶段四评估 |
+| 模组环境 | 原版 + JEI + 少量辅助模组 |
+| 可选优化模组 | Sodium 0.8.13-neoforge（1.21.1）、Embeddium |
+| 构建 | Gradle（ModDevGradle）+ Android NDK / CMake；插件壳需 Android SDK |
+| 许可证 | LGPL-3.0-or-later |
+
+---
+
+## 4. 总体架构
+
+```
+┌─────────────────────────────────────┐
+│ Sodium / Embeddium / 其他优化模组      │
+├─────────────────────────────────────┤
+│ Java 模组层（NeoForge Mod: glesmod）   │
+│ - 能力探测 / 配置 / 兼容层 / 降级路由  │
+│ - 状态上报 / 日志 / 设备兼容性数据库   │
+├─────────────────────────────────────┤
+│ native 后端（替代 libGL.so，C/C++）  │
+│ - 桌面 GL ABI → GLES 3.2 映射        │
+│ - 能力表 / 状态缓存 / FBO 与 VAO 仿真 │
+├─────────────────────────────────────┤
+│ LWJGL → libGL.so（本项目提供）        │
+│ → libGLESv2.so                       │
+├─────────────────────────────────────┤
+│ Minecraft 1.21.1 / NeoForge / FCL     │
+└─────────────────────────────────────┘
+```
+
+**关键机制**：
+- **native 侧提供符号兼容的 `libGL.so` 替代实现**，内部转发到 `libGLESv2.so`。这是全链路的关键：LWJGL 在 Linux/Android 下动态链接 `<GL>`（即 `libGL.so`），启动器允许替换该库（GL4ES / NG-GL4ES 正是以这种方式工作）。
+- 因此**不需要** LD_PRELOAD 或 inline hook：只要导出完整的 GL 1.x / 2.x / 3.x 符号集即可。风险在于符号覆盖不全，故需维护符号导出清单与覆盖率测试。
+- Java 侧 Mixin 仅承担**低频高价值**职责：能力探测、兼容层联动、降级决策、日志上报。**不在热点路径上转发每一个 GL 调用。**
+- 低频或暂未实现的调用在 native 侧内部回退到 GL4ES / MobileGlues（如可用）。
+- 检测到 Sodium / Embeddium 时，启用更激进的降级与状态缓存策略。
+- 能力接口通过 Java 侧暴露，供 Sodium 兼容层或未来的上游集成查询。
+
+---
+
+## 5. 关键接口与契约
+
+### 5.1 能力提供接口
+
+```java
+public interface GlesCapabilityProvider {
+    boolean supportsMultiDraw();
+    boolean supportsComputeShaders();
+    boolean supportsPersistentMapping();
+    boolean supportsInstancing();
+    int getMaxTextureUnits();
+    int getMaxDrawBuffers();
+    String getGlesVersion();
+}
+```
+
+### 5.2 配置示例
+
+```json
+{
+  "gles_compat": {
+    "multi_draw": false,
+    "compute_shaders": false,
+    "persistent_mapping": true,
+    "instancing": true,
+    "max_draw_buffers": 4,
+    "fallback_to_gl4es": true
+  }
+}
+```
+
+### 5.3 降级路由
+
+> v1 此处写的是 Java 侧 `try/catch` + `GlesUnsupportedException`。native 路线落实后，**热点路径上的降级由 native 层内部完成**（不抛异常、不过 JNI），Java 侧只负责能力上报与日志。
+
+**native 侧**：查询能力表决定路由，不可用时自动拆解为可用调用序列，并**只记录一次**降级事件：
+
+```c
+/* 能力表在初始化时填充，路由判断不涉及 JNI */
+void glMultiDrawElements(GLenum mode, const GLsizei *count,
+                         GLenum type, const void *const *indices,
+                         GLsizei drawcount)
+{
+    if (g_caps.multi_draw) {
+        g_real_glMultiDrawElements(mode, count, type, indices, drawcount);
+        return;
+    }
+    /* 降级：逐次绘制 */
+    for (GLsizei i = 0; i < drawcount; ++i) {
+        if (count[i] == 0) continue;
+        g_real_glDrawElements(mode, count[i], type, indices[i]);
+    }
+    GLES_COMPAT_WARN_ONCE(GLES_DEGRADE_MULTIDRAW,
+                          "Multi-Draw 不可用，已降级为循环绘制");
+}
+```
+
+**Java 侧**：只读地暴露能力与降级状态，供兼容层与日志使用：
+
+```java
+public interface GlesCapabilityProvider {
+    // ... 见 5.1
+}
+
+// 降级事件由 native 层上报，Java 侧只负责读取与展示
+List<DegradeEvent> events = GlesBackend.INSTANCE.getDegradeEvents();
+GlesCompatLog.warnOnce("Multi-Draw 不可用，已降级为循环绘制");
+```
+
+---
+
+## 6. 任务分解
+
+### 阶段一：MVP（原版 + JEI 跑通）
+
+| 编号 | 任务 | 优先级 | 依赖 | 产出 |
+|---|---|---|---|---|
+| P1-01 | 工程基线：清理模板示例代码、配置 mod id / license / 作者、接入 Mixin | P0 | 无 | 可构建的空模组 |
+| P1-02 | 定义 `GlesBackend` 接口与空实现（Java 侧） | P0 | P1-01 | 接口文件 |
+| P1-03 | 定义 native 层 ABI：JNI 入口、能力查询、错误码 | P0 | P1-02 | JNI 绑定 |
+| P1-04 | native 层：GL 入口表 + `libGL.so` 符号导出（**只需 89 个符号，见 `docs/o-02-symbol-inventory.md`**） | P0 | P1-03 | native 库骨架 |
+| P1-05 | FCL 渲染器插件壳：按 RendererPlugin v2 规范产出 APK，指向本项目 GL 库 | P0 | P1-04 | 可安装插件 |
+| P1-06 | EGL 复用验证：确认 FCL 当前 EGL 实现，评估是否存在与 ANGLE 叠加的双重翻译 | P0 | P1-05 | ✅ 已完成：见 v4 修订记录 |
+| P1-07 | 着色器转换接入：尽最大努力兼容，无法转换则降级不崩溃 | P0 | P1-04 | 转换接入说明 |
+| P1-08 | 原版世界、GUI、JEI 渲染测试（用户在真机执行） | P0 | P1-07 | 测试报告 |
+| P1-09 | 基准测试脚本与性能数据 CSV | P1 | P1-08 | 可复现数据 |
+| P1-10 | README、构建步骤、已知限制 | P1 | P1-08 | 文档 |
+
+**验收**：用户在 Android 设备上，FCL（选用本项目渲染器）+ NeoForge 1.21.1 + 原版 + JEI，启动到主菜单，进入世界，打开背包/JEI，运行 10 分钟不崩溃。
+
+### 阶段二：Sodium 软依赖框架
+
+| 编号 | 任务 | 优先级 | 依赖 | 产出 |
+|---|---|---|---|---|
+| P2-01 | 实现 `GlesCapabilityProvider` 与配置系统 | P0 | P1 | 能力接口 ✅ |
+| P2-02 | 检测 Sodium 0.8.x / Embeddium 是否存在及版本 | P0 | P2-01 | 检测模块 ✅ |
+| P2-03 | Sodium 0.8.x 兼容层：读取能力并调整其内部功能标志 | P0 | P2-02 | 兼容层 ✅ |
+| P2-04 | 实现 Multi-Draw、计算着色器、持久映射的降级路由（**仅 Sodium 路径需要，不阻塞 MVP**） | P1 | P2-03 | 降级模块 ✅ `docs/p2-04-degrade-routing.md` |
+| P2-05 | Embeddium（NeoForge 侧对应物）软依赖适配评估 | P1 | P2-03 | 评估报告 ✅ `docs/p2-05-embeddium-assessment.md` |
+| P2-06 | Sodium 启动测试：不崩溃、基础区块渲染正常 | P0 | P2-04 | 测试报告 ✅ |
+| P2-07 | 文档：Sodium / Embeddium 兼容矩阵与已知问题 | P1 | P2-06 | 文档 ✅ `docs/p2-07-compatibility-matrix.md` |
+
+**验收**：安装 Sodium 0.8.13-neoforge（1.21.1） 后能启动，不崩溃，世界渲染正常；日志明确记录哪些功能被禁用；FPS 不低于 GL4ES 基线的 70%。
+
+> ✅ **2026-09-29 阶段二验收结果：全部通过。**
+> 真机（Adreno 750）实测：Sodium 加载为 `FULLY_SUPPORTED`，零降级事件，零缺失符号，零渲染错误；
+> ZL2 启动器下 **300~400 FPS**，高于指标。P2-04/05/07 文档已补齐。
+> 另在 P2-05 评估中发现并修复一个高危项（`glBufferStorage` 静默 stub），
+> 详见 `docs/status-report.md` §4.3。
+
+### 阶段三：性能优化与功能补齐
+
+| 编号 | 任务 | 优先级 | 依赖 | 产出 |
+|---|---|---|---|---|
+| P3-01 | native 侧状态缓存，减少冗余 GLES 调用 | P0 | P2 | 状态缓存模块 ✅ **部分**：每调用固定开销已消除（见 `docs/p3-01-hotpath-optimization.md`）|
+| P3-02 | 针对 TBDR 架构优化：减少 FBO 切换、使用 `glInvalidateFramebuffer` | P0 | P3-01 | 优化补丁 |
+| P3-03 | 粒子渲染实例化优化 | P1 | P3-01 | 粒子模块 |
+| P3-04 | 剔除逻辑确认与 CPU 端优化 | P1 | P3-01 | 剔除模块 |
+| P3-05 | 设备兼容性数据库与回退开关 | P1 | P3-02 | 兼容性表 |
+| P3-06 | CI/CD：自动构建 jar、插件 APK 与 native 交叉编译产物 | P1 | P3-01 | GitHub Actions |
+| P3-07 | FCL 插件功能对齐：可配置环境变量（SelectableEnv / ToggleableEnv） | P2 | P1-05 | 插件配置项 |
+
+### 阶段四：生态扩展
+
+| 编号 | 任务 | 优先级 | 依赖 | 产出 |
+|---|---|---|---|---|
+| P4-01 | Pojav 支持评估：调研 Amethyst-Android / ZalithLauncher 是否支持自定义 GL 库路径 | P1 | P3 | 调研报告 |
+| P4-02 | 若 P4-01 不可行，提供 Mixin mod 形态作为功能兼容路径（性能妥协） | P2 | P4-01 | 兼容模块 |
+| P4-03 | 探索 Iris 光影兼容（可选） | P3 | P4-01 | 可行性报告 ⚠️ 见下方结论 |
+| P4-04 | 社区贡献指南、Good First Issue | P1 | P3 | CONTRIBUTING.md |
+| P4-05 | 与 Sodium / MobileGlues 社区沟通，推动上游适配 | P2 | P3 | 协作记录 |
+
+> **P4-03 前置结论（2026-09-29，已核实）**：光照影**不是**本项目的瓶颈，
+> 而是**上游版本配套问题**。真机实测：
+>
+> | 组合 | 结果 |
+> |---|---|
+> | Iris **1.8.12** + Sodium **0.8.13** | ❌ 进世界崩溃（`SodiumGameOptions$PerformanceSettings` 类不存在） |
+> | Iris **1.8.14-beta.1** + Sodium 0.8.13 | ⏳ 未测（其 changelog 明确写「Updates to Sodium 0.8」） |
+>
+> **根因**：Sodium 在 0.8 把 `SodiumGameOptions` 重构为 `SodiumOptions`，
+> 而 Iris 1.8.12 的 Mixin 仍指向旧类名 → `ClassNotFoundException`。
+> **崩溃发生在 Mixin 阶段（Java 侧），与本项目的 GL 后端无关**
+> （同日日志显示我们的 `降级事件/缺失符号/被调用的空实现` 均为 0）。
+>
+> **⇒ 在 Sodium 0.8.13 基线上，光影只能靠 Iris 1.8.14-beta.1。**
+> 详见 `docs/known-issues-iris.md`。
+
+> **另注**：`Oculus` 已停更，且其 1.21.1 移植版质量极差，**不纳入评估范围**。
+
+---
+
+## 7. 里程碑与交付物
+
+| 里程碑 | 交付物 | 时间 |
+|---|---|---|
+| M1：MVP 跑通 | 源码、可构建 jar + native 库、性能数据、README | 阶段一结束 |
+| M2：Sodium 可启动 | 兼容层、降级日志、测试报告 | 阶段二结束 |
+| M3：性能优化 | 状态缓存、TBDR 优化、CI | 阶段三结束 |
+| M4：生态扩展 | 多版本支持、贡献指南 | 阶段四结束 |
+
+---
+
+## 8. 验收标准
+
+1. 在指定设备上，原版 + JEI 可稳定运行 10 分钟不崩溃。
+2. 日志显示 GLES 后端已激活，能力协商输出完整。
+3. 安装 Sodium 0.8.13-neoforge（1.21.1）后能启动，不崩溃，基础渲染正常。
+4. 降级功能有明确日志，玩家可理解。
+5. 提供可复现的基准测试脚本与 CSV 结果。
+6. 仓库包含 README、构建步骤、已知限制、贡献指南。
+7. 许可证为 LGPL-3.0-or-later，不包含 Mojang 代码或资源。
+8. native 库的 GL 符号覆盖率有可复现的检测报告。
+
+---
+
+> ### v5（2026-09-25）O-02 闭环：工作量大幅下修
+>
+> 通过 `native/tools/` 下的四个脚本完成量化分析，详见 `docs/o-02-symbol-inventory.md`。
+>
+> **核心数据**：
+>
+> | 指标 | 原估算 | 实测 |
+> |---|---|---|
+> | 需导出符号数 | 316（GL 3.2 core 全集） | **89** |
+> | GLES 可直接满足 | — | **79（88.8%）** |
+> | 需额外适配 | 约 82 | **5（5.6%）** |
+>
+> **四项重大发现**：
+>
+> 1. **MC 只用到 GL 3.0**，未引用 `GL31`/`GL32` 或更高绑定类。这意味着 **ES 3.0 即可满足原版**，ES 3.2 是充裕的。
+> 2. **原版不使用任何 ES 受限高阶功能**：Multi-Draw、计算着色器、间接绘制、持久映射、同步对象、实例化渲染——**全部未使用**。
+> 3. **5 个需适配的符号经调用链追踪确认非关键路径**：`glGetTexImage`/`glDrawPixels` 仅用于图像回读（`NativeImage` 类），不在每帧渲染循环。
+> 4. `glDrawPixels`、`glLogicOp`、`glPolygonMode`、`glClearDepth` 均可 stub 或简单转换，MVP 必需部分仅约 25 行代码。
+>
+> **据此调整**：
+>
+> - P1-04 符号导出范围锁定为 **89 个**（见 `docs/o-02-symbol-inventory.md`），不追求 GL 3.2 core 全集
+> - P2-04（Multi-Draw / 计算着色器 / 持久映射降级）**从 P0 降为 P1**，它们仅服务于 Sodium 路径，不阻塞 MVP
+> - ES 版本目标可放宽：MVP 为 ES 3.0，ES 3.2 作为增强（降低 R-11 风险）
+>
+> ⚠️ **v6 之后的事实修正（2026-09-29）**：v5 给出的「89 个」是**原版 MC 直接引用**的符号数。
+> 实机跑通后发现，**LWJGL 的 `createCapabilities()` 会解析它声明的全部 native 方法**，
+> 缺失任何「必需函数」都会抛 NPE 硬崩溃（真机已两次踩到）。
+> 因此实际导出量必须覆盖 LWJGL 的完整声明集，最终为 **849 个**（345 转发 + 20 定制 + 484 stub）。
+> 详见 `native/symbols.def` 头部说明与 `docs/status-report.md` §5。
+>
+> ### v6（2026-09-29）阶段一、二完成；两处定向修复
+>
+> **阶段一与阶段二均已完成并通过真机验收。** 详见 `docs/status-report.md`。
+>
+> | 项 | 结论 |
+> |---|---|
+> | 主菜单 / 世界 / Sodium | ✅ 全部跑通，**零渲染错误** |
+> | 性能 | ✅ 与 MobileGlues / Zink **相当**（原版环境几乎无差别），非「超越」 |
+> | P2-04 / P2-05 / P2-07 | ✅ 三份文档已补齐 |
+> | `glBufferStorage` | ⚠️→✅ 从静默 stub 改为**真实分配 + 降级**（原会导致 Embeddium 崩溃） |
+> | `glMapBufferRange` | ⚠️→✅ 剥离 ES 非法的持久/一致映射位后转发 |
+>
+> **由此新增的一条设计原则**（值得写入长期约定）：
+>
+> > **静默 stub 只适用于「调用方不会依赖其返回值/副作用」的函数。**
+> > 若函数的契约包含产生某种资源（分配存储、创建对象、返回句柄），
+> > 做成静默 stub 就等于**用一个谎言替换一次失败**，而谎言会在很远的地方以完全无关的形式暴露。
+>
+> **据此需修订 v5 的第 4 条**：「均可 stub 或简单转换」这一判断过于乐观 ——
+> **stub 的适用性必须逐个按「调用方是否依赖其副作用」来判定**，不能一概而论。
+>
+> **R-06「性能不如 GL4ES」已可作废**（实测与 MobileGlues / Zink 相当），
+> 但仍未做严格 A/B 对比，
+> P1-09（可复现基准脚本与 CSV）仍应完成，才能给出严格结论。
+>
+> **新增遗留审计项 R-12**：其余 484 个 stub 尚未逐一审计是否存在同类问题。
+
+---
+
+## 9. 风险与应对
+
+| 风险 | 应对 |
+|---|---|
+| 驱动差异导致渲染错误 | 建立设备兼容性数据库，提供回退 GL4ES 开关（**P3-05，尚未实现**） |
+| GL 符号覆盖不全导致启动失败 | 维护符号导出清单 + 两道自动门禁（指针类型校验、产物导出符号校验） |
+| Sodium 版本更新频繁 | 当前锁定 Sodium 0.8.13-neoforge（1.21.1）为主开发目标 |
+| Mixin 冲突 | **架构上不做 Mixin 注入**（软依赖检测 + 保守策略），从根本上避免 |
+| ~~性能不如 GL4ES~~ | ✅ **已作废**（但理由已更正）：与 MobileGlues / Zink 原版环境几乎无差别 => **相当**，而非「超越」 |
+| 法律风险 | 不包含 Mojang 代码，遵守 EULA；自研实现不复制 MobileGlues / GL4ES 代码 |
+| 工程量大 | 分阶段，先 MVP，再扩展；吸引 fork |
+| 无真机自动化验证 | 测试由用户在真机执行；项目提供标准化测试清单与日志采集脚本 |
+| **静默 stub 掩盖真实失败** | **新增（R-12）**：已确立「按副作用判定 stub 适用性」的原则；**484 个 stub 待逐一审计** |
+
+---
+
+## 10. 开源与协作策略
+
+- **许可证**：LGPL-3.0-or-later。
+- **README**：目标、非目标、构建、测试、已知限制、性能数据。
+- **模块化**：Java 模组层（能力/配置/兼容层）、native 后端层（GL 映射/状态缓存）、构建接入层，三者独立。
+- **CI/CD**：GitHub Actions 自动构建 jar；native 交叉编译需 Android NDK，先在本地验证后再接入 CI。
+- **Good First Issue**：补充文档、添加基准脚本、补充符号导出清单条目。
+- **性能基准**：原版生存、JEI 搜索、箱子界面，记录 FPS、帧生成时间、CPU 占用。
+
+---
+
+## 11. Agent 执行指令
+
+请按以下顺序启动：
+
+1. 工程基线：包名 `com.youyimc.glesmod`，清理 NeoForge 模板示例代码，许可证设为 LGPL-3.0-or-later。
+2. 输出阶段一任务看板，并开始 P1-01 至 P1-03。
+3. 先提交设计文档：`docs/architecture.md`、`docs/capability-interface.md`。
+4. 每完成一个任务提交 PR，更新 README 与任务状态。
+5. 阶段一完成后，输出测试报告与性能数据，再进入阶段二。
+
+**首个交付要求**：工程骨架 + `GlesBackend` 接口草案 + native ABI 与启动器接入方案说明。
+
+---
+
+## 12. 待确认事项（阻塞项）
+
+以下事项尚未闭环，需确认后才能真正进入编码阶段：
+
+| 编号 | 事项 | 影响 | 当前状态 |
+|---|---|---|---|
+| ~~O-01~~ | ~~`libGL.so` 替换在 FCL / Pojav 分支上的可行性验证~~ | — | ✅ **已闭环**：FCL 渲染器即 `dlopen` 一个 GL 库，本项目天然是其插件 |
+| O-02 | GL 符号导出清单的完整度（哪些符号必须存在） | 决定 MVP 的工作量与启动成功率 | ✅ **已闭环**：只需 89 个符号，79 个直接转发，5 个需适配。见 `docs/o-02-symbol-inventory.md` |
+| O-03 | 自研实现与 MobileGlues / NG-GL4ES 的许可证兼容性比对 | 决定能否参考其代码结构，影响交付时间与法律风险 | 待评估 |
+| O-04 | Sodium 0.8.13 在 1.21.1 上的 ThinGL 依赖关系 | 影响 P2-03 兼容层的注入点选择 | 待核实 |
+| O-05 | 目标真机与编译器版本 | 无法本地验证，只能由用户手工测试 | 待确认 |
+| O-06 | 着色器转换的复用方式（§6.3） | 影响 P1-07 的实现路径 | ✅ 已定：尽最大努力兼容 + GL4ES 兜底 |
+| O-07 | GitHub 仓库是否公开发布及发布时机 | 影响 CI 与协作方式 | 待确认 |
+| **O-08** | **FCL 当前 EGL 实现是否为 ANGLE** | 若是，则 GLES 输出会再经 ANGLE 翻译一层，需调整策略 | ✅ **已闭环**：FCL 使用系统 `libEGL.so`，非 ANGLE |
+| **O-09** | **插件渲染器未自动设置 `LIBGL_ES`** | 必须在插件 env 中显式声明 `LIBGL_ES=3`，否则上下文版本不可控 | ✅ 已定：写入 P1-05 实现要求 |
+
+---
+
+**任务书结束。**

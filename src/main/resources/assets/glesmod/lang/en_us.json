@@ -1,0 +1,11 @@
+{
+  "glesmod.configuration.title": "GLES Mod Settings",
+  "glesmod.configuration.section.glesmod.common.toml": "GLES Mod Settings",
+  "glesmod.configuration.section.glesmod.common.toml.title": "GLES Mod Settings",
+
+  "glesmod.configuration.enabled": "Enable Mod",
+  "glesmod.configuration.degradeLevel": "Degrade Level",
+  "glesmod.configuration.verboseLog": "Verbose Diagnostic Report",
+  "glesmod.configuration.warnIfInactive": "Warn When Backend Inactive",
+  "glesmod.configuration.pollStatusFile": "Poll Status File"
+}

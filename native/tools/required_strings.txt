@@ -1,0 +1,122 @@
+# required_strings.txt -- string markers that MUST be present in the built .so
+#
+# Why this file exists
+# -------------------
+# verify_exported_symbols.py checks that a symbol EXISTS in the dynamic symbol
+# table. That is necessary but NOT sufficient: a symbol that the symbol table
+# marks F (real forwarder) and a symbol that the symbol table marks C (custom
+# implementation) are BOTH exported under the same name. So the symbol check
+# cannot tell "my new implementation is in the binary" apart from
+# "the old forwarder is still in the binary".
+#
+# This was not theoretical. Adding the glGetStringi implementation produced a
+# binary that passed the symbol gate while being byte-identical to the previous
+# one, because the name had always been exported. Two device-test rounds were
+# spent on a stale artifact whose unchanged size should have been the giveaway.
+#
+# A string literal that exists ONLY in the new code path is the reliable judge:
+# if it is absent from the raw bytes of the artifact, the new code is not in
+# there, no matter what the build system claims.
+#
+# Format
+# ------
+#   - One marker per line, matched as a raw byte sequence (ASCII).
+#   - Blank lines and lines starting with '#' are ignored.
+#   - Keep markers short and unique: they must not appear in unrelated code.
+#
+# Maintenance rule: when you add a new custom implementation whose behaviour is
+# explained by a distinctive literal, add that literal here. This is cheap and
+# it converts "silent stale artifact" into "failed build".
+#
+# LGPL-3.0-or-later
+
+# glGetString: the version string Iris parses with a regex. If this is absent,
+# Iris falls back to "could not parse GL version".
+3.2 (OpenGL ES 3.2
+
+# glGetString(GL_EXTENSIONS): the appended extension name. This is the path
+# LWJGL actually uses on ES (it parses the space-separated GL_EXTENSIONS string
+# and never calls glGetStringi). If this literal is absent, Iris keeps reporting
+# "Buffer blending is not supported on this platform".
+GL_ARB_draw_buffers_blend
+
+# glGetString(GL_EXTENSIONS): the positive log line proving the append ran.
+GL_EXTENSIONS
+
+# glGetIntegerv: proof the GL_NUM_EXTENSIONS +1 bump is compiled in. Without the
+# bump, LWJGL's INDEXED path (selected because our GL_VERSION reports major >= 3)
+# loops only to the driver's real count and can never reach the appended entry.
+GL_NUM_EXTENSIONS
+
+# glTexStorage2D/3D: proof the depth-format translation covers the IMMUTABLE
+# STORAGE path too. This was the actual cause of FBO status 36055
+# (INCOMPLETE_MISSING_ATTACHMENT): glTexStorage2D was a plain forwarder, so a
+# desktop GL_DEPTH_COMPONENT internal format was rejected by the driver, the
+# texture got no storage, and attaching it produced an empty framebuffer.
+glTexStorage2D
+
+# glTexImage2D: proof the ES-3.0 pixel-type table is compiled in. This was the
+# actual cause of FBO status 36055 on the device: Iris allocated its colour
+# texture with internalformat=GL_R11F_G11F_B10F (a FLOAT format) but
+# type=GL_UNSIGNED_BYTE, which is legal on desktop GL and illegal in ES 3.0.
+# The driver answered GL_INVALID_OPERATION, the texture got no storage, and
+# attaching it produced INCOMPLETE_MISSING_ATTACHMENT.
+#
+# NOTE ON MARKER CHOICE: a marker must be a STRING LITERAL that ends up in the
+# binary. A macro name (e.g. GLES_UNSIGNED_INT_10F_11F_11F_REV) does NOT appear
+# in the artifact -- only its numeric value does -- so using a macro name here
+# produces a false "stale artifact" alarm. Verified the hard way.
+ES 3.0 表 3.2
+
+# glCheckFramebufferStatus: the diagnostic line prefix. If this is absent, an
+# incomplete FBO is reported by Iris with only a bare status code.
+FBO
+
+# glCheckFramebufferStatus: proof the storage-size probe is compiled in. Its
+# whole purpose is to distinguish "attachment object exists" from "attachment
+# has no storage", because INCOMPLETE_MISSING_ATTACHMENT (36055 = 0x8CD7)
+# means precisely the latter.
+存储
+
+
+
+# Rule P (mixed int/uint binary operations): proof the rewrite is
+# compiled in. Flywheel's common.vert has `gl_VertexID - baseVertex`
+# (int - uint), legal in desktop GLSL and forbidden in GLSL ES; the
+# device reported "no operation '-' exists that takes a left-hand
+# operand of type 'gl_VertexID int' and a right operand of type 'in
+# uint'". This ASCII token occurs in the rule-P diagnostic string and
+# nowhere else, so it distinguishes "new code present" from "stale".
+int/uint
+
+# Rule R (user-function signature table). Proves the artifact contains the fix
+# for defect 2: a bare int literal passed to a user-defined function's int
+# parameter must keep its integer type, and a float parameter must get .0.
+# Without this marker a stale .so would silently revert that behaviour, and the
+# only symptom would be a driver error on a phone saying
+#     'c1' : no matching overloaded function found
+GLESMOD_RULE_R_SIGNATURES
+
+# Defect 3 fix: ambiguous names (int in one scope, float in another) are removed
+# from the float table so they are never used to wrap an integer operand.
+# Without this marker a stale .so silently reverts it, and the only symptom is a
+# driver error saying float + int has no matching operator.
+GLESMOD_AMBIG_DROP
+
+# Defects A + B (Simulated, native.log 14:20:03 / 14:20:04). Both are about
+# built-in functions whose parameters are int and whose return type is an
+# integer vector -- `textureSize` being the one that bit us:
+#
+#   A) `vec2(textureSize(tex, 0))` -- the float constructor made us rewrite the
+#      int-only `lod` argument to `0.0`. Driver: 'textureSize' : no matching
+#      overloaded function found.  This ASCII token is in the rule-S diagnostic
+#      string and nowhere else.
+#
+#   B) `vec2 size = textureSize(tex, 0)` and `vec2(16.,0.) / textureSize(tex,0)`
+#      -- textureSize returns ivec2, so it must be wrapped in vec2(...) for ES.
+#      Driver: no operation '/' exists ... 'const 2-component vector of float'
+#      and a right operand of type '2-component vector of int'.
+#
+# Note textureLod is deliberately NOT in the table: its lod is a float and DOES
+# need `.0`. Same syntax, opposite requirement -- hence a per-function table.
+GLESMOD_RULE_S_BUILTIN_INT_ARGS

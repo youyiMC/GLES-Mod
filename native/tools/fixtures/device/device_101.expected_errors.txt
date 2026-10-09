@@ -1,0 +1,4 @@
+阶段=片元
+ERROR: 0:21: 'textureSize' : no matching overloaded function found
+ERROR: 0:47: 'textureSize' : no matching overloaded function found
+ERROR: 0:109: '=' :  cannot convert from '2-component vector of int' to '2-component vector of float'

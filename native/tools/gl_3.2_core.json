@@ -1,0 +1,2861 @@
+{
+  "source": "Khronos OpenGL-Registry gl.xml",
+  "gl_version": "3.2",
+  "profile": "core",
+  "total": 316,
+  "by_class": {
+    "forward": 278,
+    "map": 30,
+    "shader": 4,
+    "emulate": 4
+  },
+  "commands": [
+    {
+      "name": "glActiveTexture",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_3"
+      ]
+    },
+    {
+      "name": "glAttachShader",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glBeginConditionalRender",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glBeginQuery",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glBeginTransformFeedback",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glBindAttribLocation",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glBindBuffer",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glBindBufferBase",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0",
+        "GL_VERSION_3_1"
+      ]
+    },
+    {
+      "name": "glBindBufferRange",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_0",
+        "GL_VERSION_3_1"
+      ]
+    },
+    {
+      "name": "glBindFragDataLocation",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glBindFramebuffer",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glBindRenderbuffer",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glBindTexture",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_1"
+      ]
+    },
+    {
+      "name": "glBindVertexArray",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glBlendColor",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_1_4"
+      ]
+    },
+    {
+      "name": "glBlendEquation",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_4"
+      ]
+    },
+    {
+      "name": "glBlendEquationSeparate",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glBlendFunc",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glBlendFuncSeparate",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_1_4"
+      ]
+    },
+    {
+      "name": "glBlitFramebuffer",
+      "class": "map",
+      "ret": "void",
+      "param_count": 10,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glBufferData",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glBufferSubData",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glCheckFramebufferStatus",
+      "class": "forward",
+      "ret": "GLenum",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glClampColor",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glClear",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glClearBufferfi",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glClearBufferfv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glClearBufferiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glClearBufferuiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glClearColor",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glClearDepth",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glClearStencil",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glClientWaitSync",
+      "class": "forward",
+      "ret": "GLenum",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glColorMask",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glColorMaski",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glCompileShader",
+      "class": "shader",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glCompressedTexImage1D",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 7,
+      "features": [
+        "GL_VERSION_1_3"
+      ]
+    },
+    {
+      "name": "glCompressedTexImage2D",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 8,
+      "features": [
+        "GL_VERSION_1_3"
+      ]
+    },
+    {
+      "name": "glCompressedTexImage3D",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 9,
+      "features": [
+        "GL_VERSION_1_3"
+      ]
+    },
+    {
+      "name": "glCompressedTexSubImage1D",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 7,
+      "features": [
+        "GL_VERSION_1_3"
+      ]
+    },
+    {
+      "name": "glCompressedTexSubImage2D",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 9,
+      "features": [
+        "GL_VERSION_1_3"
+      ]
+    },
+    {
+      "name": "glCompressedTexSubImage3D",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 11,
+      "features": [
+        "GL_VERSION_1_3"
+      ]
+    },
+    {
+      "name": "glCopyBufferSubData",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_1"
+      ]
+    },
+    {
+      "name": "glCopyTexImage1D",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 7,
+      "features": [
+        "GL_VERSION_1_1"
+      ]
+    },
+    {
+      "name": "glCopyTexImage2D",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 8,
+      "features": [
+        "GL_VERSION_1_1"
+      ]
+    },
+    {
+      "name": "glCopyTexSubImage1D",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 6,
+      "features": [
+        "GL_VERSION_1_1"
+      ]
+    },
+    {
+      "name": "glCopyTexSubImage2D",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 8,
+      "features": [
+        "GL_VERSION_1_1"
+      ]
+    },
+    {
+      "name": "glCopyTexSubImage3D",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 9,
+      "features": [
+        "GL_VERSION_1_2"
+      ]
+    },
+    {
+      "name": "glCreateProgram",
+      "class": "forward",
+      "ret": "GLuint",
+      "param_count": 0,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glCreateShader",
+      "class": "forward",
+      "ret": "GLuint",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glCullFace",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glDeleteBuffers",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glDeleteFramebuffers",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glDeleteProgram",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glDeleteQueries",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glDeleteRenderbuffers",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glDeleteShader",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glDeleteSync",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glDeleteTextures",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_1"
+      ]
+    },
+    {
+      "name": "glDeleteVertexArrays",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glDepthFunc",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glDepthMask",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glDepthRange",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glDetachShader",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glDisable",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glDisableVertexAttribArray",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glDisablei",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glDrawArrays",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_1_1"
+      ]
+    },
+    {
+      "name": "glDrawArraysInstanced",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_3_1"
+      ]
+    },
+    {
+      "name": "glDrawBuffer",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glDrawBuffers",
+      "class": "map",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glDrawElements",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_1_1"
+      ]
+    },
+    {
+      "name": "glDrawElementsBaseVertex",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glDrawElementsInstanced",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_1"
+      ]
+    },
+    {
+      "name": "glDrawElementsInstancedBaseVertex",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 6,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glDrawRangeElements",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 6,
+      "features": [
+        "GL_VERSION_1_2"
+      ]
+    },
+    {
+      "name": "glDrawRangeElementsBaseVertex",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 7,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glEnable",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glEnableVertexAttribArray",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glEnablei",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glEndConditionalRender",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 0,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glEndQuery",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glEndTransformFeedback",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 0,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glFenceSync",
+      "class": "forward",
+      "ret": "GLsync",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glFinish",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 0,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glFlush",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 0,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glFlushMappedBufferRange",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glFramebufferRenderbuffer",
+      "class": "map",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glFramebufferTexture",
+      "class": "map",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glFramebufferTexture1D",
+      "class": "map",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glFramebufferTexture2D",
+      "class": "map",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glFramebufferTexture3D",
+      "class": "map",
+      "ret": "void",
+      "param_count": 6,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glFramebufferTextureLayer",
+      "class": "map",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glFrontFace",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glGenBuffers",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glGenFramebuffers",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glGenQueries",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glGenRenderbuffers",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glGenTextures",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_1"
+      ]
+    },
+    {
+      "name": "glGenVertexArrays",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glGenerateMipmap",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glGetActiveAttrib",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 7,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glGetActiveUniform",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 7,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glGetActiveUniformBlockName",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_1"
+      ]
+    },
+    {
+      "name": "glGetActiveUniformBlockiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_3_1"
+      ]
+    },
+    {
+      "name": "glGetActiveUniformName",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_1"
+      ]
+    },
+    {
+      "name": "glGetActiveUniformsiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_1"
+      ]
+    },
+    {
+      "name": "glGetAttachedShaders",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glGetAttribLocation",
+      "class": "forward",
+      "ret": "GLint",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glGetBooleani_v",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glGetBooleanv",
+      "class": "map",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glGetBufferParameteri64v",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glGetBufferParameteriv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glGetBufferPointerv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glGetBufferSubData",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glGetCompressedTexImage",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_1_3"
+      ]
+    },
+    {
+      "name": "glGetDoublev",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glGetError",
+      "class": "map",
+      "ret": "GLenum",
+      "param_count": 0,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glGetFloatv",
+      "class": "map",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glGetFragDataLocation",
+      "class": "forward",
+      "ret": "GLint",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glGetFramebufferAttachmentParameteriv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glGetInteger64i_v",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glGetInteger64v",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glGetIntegeri_v",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0",
+        "GL_VERSION_3_1"
+      ]
+    },
+    {
+      "name": "glGetIntegerv",
+      "class": "map",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glGetMultisamplefv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glGetProgramInfoLog",
+      "class": "shader",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glGetProgramiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glGetQueryObjectiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glGetQueryObjectuiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glGetQueryiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glGetRenderbufferParameteriv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glGetShaderInfoLog",
+      "class": "shader",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glGetShaderSource",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glGetShaderiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glGetString",
+      "class": "map",
+      "ret": "const GLubyte *",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glGetStringi",
+      "class": "map",
+      "ret": "const GLubyte *",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glGetSynciv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glGetTexImage",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glGetTexLevelParameterfv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glGetTexLevelParameteriv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glGetTexParameterIiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glGetTexParameterIuiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glGetTexParameterfv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glGetTexParameteriv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glGetTransformFeedbackVarying",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 7,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glGetUniformBlockIndex",
+      "class": "forward",
+      "ret": "GLuint",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_1"
+      ]
+    },
+    {
+      "name": "glGetUniformIndices",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_3_1"
+      ]
+    },
+    {
+      "name": "glGetUniformLocation",
+      "class": "forward",
+      "ret": "GLint",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glGetUniformfv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glGetUniformiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glGetUniformuiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glGetVertexAttribIiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glGetVertexAttribIuiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glGetVertexAttribPointerv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glGetVertexAttribdv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glGetVertexAttribfv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glGetVertexAttribiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glHint",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glIsBuffer",
+      "class": "forward",
+      "ret": "GLboolean",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glIsEnabled",
+      "class": "forward",
+      "ret": "GLboolean",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glIsEnabledi",
+      "class": "forward",
+      "ret": "GLboolean",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glIsFramebuffer",
+      "class": "forward",
+      "ret": "GLboolean",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glIsProgram",
+      "class": "forward",
+      "ret": "GLboolean",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glIsQuery",
+      "class": "forward",
+      "ret": "GLboolean",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glIsRenderbuffer",
+      "class": "forward",
+      "ret": "GLboolean",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glIsShader",
+      "class": "forward",
+      "ret": "GLboolean",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glIsSync",
+      "class": "forward",
+      "ret": "GLboolean",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glIsTexture",
+      "class": "forward",
+      "ret": "GLboolean",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_1"
+      ]
+    },
+    {
+      "name": "glIsVertexArray",
+      "class": "forward",
+      "ret": "GLboolean",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glLineWidth",
+      "class": "emulate",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glLinkProgram",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glLogicOp",
+      "class": "emulate",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glMapBuffer",
+      "class": "forward",
+      "ret": "void *",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glMapBufferRange",
+      "class": "forward",
+      "ret": "void *",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glMultiDrawArrays",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_1_4"
+      ]
+    },
+    {
+      "name": "glMultiDrawElements",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_1_4"
+      ]
+    },
+    {
+      "name": "glMultiDrawElementsBaseVertex",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 6,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glPixelStoref",
+      "class": "map",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glPixelStorei",
+      "class": "map",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glPointParameterf",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_4"
+      ]
+    },
+    {
+      "name": "glPointParameterfv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_4"
+      ]
+    },
+    {
+      "name": "glPointParameteri",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_4"
+      ]
+    },
+    {
+      "name": "glPointParameteriv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_4"
+      ]
+    },
+    {
+      "name": "glPointSize",
+      "class": "emulate",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glPolygonMode",
+      "class": "emulate",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glPolygonOffset",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_1"
+      ]
+    },
+    {
+      "name": "glPrimitiveRestartIndex",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_3_1"
+      ]
+    },
+    {
+      "name": "glProvokingVertex",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glReadBuffer",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glReadPixels",
+      "class": "map",
+      "ret": "void",
+      "param_count": 7,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glRenderbufferStorage",
+      "class": "map",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glRenderbufferStorageMultisample",
+      "class": "map",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glSampleCoverage",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_1_3"
+      ]
+    },
+    {
+      "name": "glSampleMaski",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glScissor",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glShaderSource",
+      "class": "shader",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glStencilFunc",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glStencilFuncSeparate",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glStencilMask",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glStencilMaskSeparate",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glStencilOp",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glStencilOpSeparate",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glTexBuffer",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_1"
+      ]
+    },
+    {
+      "name": "glTexImage1D",
+      "class": "map",
+      "ret": "void",
+      "param_count": 8,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glTexImage2D",
+      "class": "map",
+      "ret": "void",
+      "param_count": 9,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glTexImage2DMultisample",
+      "class": "map",
+      "ret": "void",
+      "param_count": 6,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glTexImage3D",
+      "class": "map",
+      "ret": "void",
+      "param_count": 10,
+      "features": [
+        "GL_VERSION_1_2"
+      ]
+    },
+    {
+      "name": "glTexImage3DMultisample",
+      "class": "map",
+      "ret": "void",
+      "param_count": 7,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    },
+    {
+      "name": "glTexParameterIiv",
+      "class": "map",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glTexParameterIuiv",
+      "class": "map",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glTexParameterf",
+      "class": "map",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glTexParameterfv",
+      "class": "map",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glTexParameteri",
+      "class": "map",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glTexParameteriv",
+      "class": "map",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glTexSubImage1D",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 7,
+      "features": [
+        "GL_VERSION_1_1"
+      ]
+    },
+    {
+      "name": "glTexSubImage2D",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 9,
+      "features": [
+        "GL_VERSION_1_1"
+      ]
+    },
+    {
+      "name": "glTexSubImage3D",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 11,
+      "features": [
+        "GL_VERSION_1_2"
+      ]
+    },
+    {
+      "name": "glTransformFeedbackVaryings",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glUniform1f",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniform1fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniform1i",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniform1iv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniform1ui",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glUniform1uiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glUniform2f",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniform2fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniform2i",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniform2iv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniform2ui",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glUniform2uiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glUniform3f",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniform3fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniform3i",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniform3iv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniform3ui",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glUniform3uiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glUniform4f",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniform4fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniform4i",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniform4iv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniform4ui",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glUniform4uiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glUniformBlockBinding",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_1"
+      ]
+    },
+    {
+      "name": "glUniformMatrix2fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniformMatrix2x3fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_1"
+      ]
+    },
+    {
+      "name": "glUniformMatrix2x4fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_1"
+      ]
+    },
+    {
+      "name": "glUniformMatrix3fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniformMatrix3x2fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_1"
+      ]
+    },
+    {
+      "name": "glUniformMatrix3x4fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_1"
+      ]
+    },
+    {
+      "name": "glUniformMatrix4fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glUniformMatrix4x2fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_1"
+      ]
+    },
+    {
+      "name": "glUniformMatrix4x3fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_1"
+      ]
+    },
+    {
+      "name": "glUnmapBuffer",
+      "class": "forward",
+      "ret": "GLboolean",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_1_5"
+      ]
+    },
+    {
+      "name": "glUseProgram",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glValidateProgram",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 1,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib1d",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib1dv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib1f",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib1fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib1s",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib1sv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib2d",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib2dv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib2f",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib2fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib2s",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib2sv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib3d",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib3dv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib3f",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib3fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib3s",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib3sv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4Nbv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4Niv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4Nsv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4Nub",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4Nubv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4Nuiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4Nusv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4bv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4d",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4dv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4f",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4fv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4iv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4s",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4sv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4ubv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4uiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttrib4usv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI1i",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI1iv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI1ui",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI1uiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI2i",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI2iv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI2ui",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI2uiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI3i",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI3iv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI3ui",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI3uiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI4bv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI4i",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI4iv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI4sv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI4ubv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI4ui",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI4uiv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribI4usv",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 2,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribIPointer",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 5,
+      "features": [
+        "GL_VERSION_3_0"
+      ]
+    },
+    {
+      "name": "glVertexAttribPointer",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 6,
+      "features": [
+        "GL_VERSION_2_0"
+      ]
+    },
+    {
+      "name": "glViewport",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 4,
+      "features": [
+        "GL_VERSION_1_0"
+      ]
+    },
+    {
+      "name": "glWaitSync",
+      "class": "forward",
+      "ret": "void",
+      "param_count": 3,
+      "features": [
+        "GL_VERSION_3_2"
+      ]
+    }
+  ]
+}

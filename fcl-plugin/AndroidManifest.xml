@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  FCL 渲染器插件清单。
+
+  【重要】本清单严格对照 FCL 源码编写，不要凭直觉简化。曾因为缺少一个
+  看似无用的字段（boatEnv）导致插件完全不被加载，且 FCL 不报任何错误。
+
+  依据一：FCL/src/main/java/com/mio/plugin/PluginManager.kt（插件发现）
+    scan() 用 queryIntentActivities(Intent(ACTION_MAIN)) 遍历已安装应用，
+    再用 meta-data 判定：
+        metaData.getBoolean(META_PLUGIN /* fclPlugin */, false)
+    因此必须有：
+        - 一个带 ACTION_MAIN 的 activity
+        - fclPlugin = true
+
+  依据二：FCL/src/main/java/com/mio/plugin/RendererPlugin.kt（插件解析）
+    parseV1() 要求的四个字段【缺一不可】，任一为 null 就静默 return，
+    插件被完全忽略（不报错、无提示）：
+        val rendererString = metaData.getString("renderer")  ?: return
+        val des            = metaData.getString("des")       ?: return
+        val boatEnvString  = metaData.getString("boatEnv")   ?: return
+        val pojavEnvString = metaData.getString("pojavEnv")  ?: return
+
+    boatEnv 对本项目无实际用途（它服务于 Pojav 的另一条渲染链路），
+    但必须存在且非空，否则整个插件不被加载。
+
+  其它要点：
+    - CATEGORY_LAUNCHER 与官方插件模板保持一致，不引入额外变量。
+    - extractNativeLibs="true" 必需：FCL 通过 ApplicationInfo.nativeLibraryDir
+      拼接路径后 dlopen 我们的 .so，不提取则该目录下不存在此文件。
+    - 使用 v1 格式（fclPlugin）而非 v2（fclPlugin_V2）：v1 的 pojavEnv
+      机制能直接注入环境变量，而我们必须设置 LIBGL_ES=3
+      （详见 docs/architecture.md §2.5 的 O-09）。
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.youyimc.glesmod.plugin">
+
+    <!-- Android 11+ 需要声明可见性才能查询/被查询包信息 -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+        </intent>
+    </queries>
+
+    <application
+        android:label="@string/app_name"
+        android:extractNativeLibs="true"
+        android:hasCode="true">
+
+        <!--
+          FCL 只做包扫描，不会启动本 Activity。
+          保留一个真实的 Activity 类是为了清单语义完整（hasCode=true 时
+          声明的组件类应当存在），避免某些 ROM 在安装期做校验时报错。
+        -->
+        <activity
+            android:name=".GLESModPluginActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- ==================== FCL 插件声明 ==================== -->
+
+        <!-- v1 插件开关：PluginManager 以此识别插件应用 -->
+        <meta-data
+            android:name="fclPlugin"
+            android:value="true" />
+
+        <!--
+          渲染器定义，格式为 name:GL库名:EGL库名
+          - GL 库：本项目提供的 libgl_gles.so（替代 libGL.so）
+          - EGL 库：复用系统的 libEGL.so（本项目不接管 EGL）
+        -->
+        <meta-data
+            android:name="renderer"
+            android:value="GLES Mod:libgl_gles.so:libEGL.so" />
+
+        <!-- 在 FCL 渲染器列表中显示的名称 -->
+        <!--
+          这里必须使用字面量而非 @string/ 引用：
+          PackageManager 在解析 meta-data 时，对 @string/ 形式的 android:value
+          存储的是资源引用 ID（Integer），而 FCL 调用的是 Bundle.getString()，
+          会返回 null。官方插件模板同样使用字面量（构建期替换占位符）。
+        -->
+        <meta-data
+            android:name="des"
+            android:value="GLES Mod (native OpenGL ES)" />
+
+        <!--
+          boatEnv：【必需字段】但本项目不用。
+
+          FCL 的 parseV1() 用 `metaData.getString("boatEnv") ?: return` 读取它，
+          缺失则直接放弃解析整个插件（不报错）。它原本服务于 Pojav 的
+          boat 渲染链路，对本项目无意义，但必须提供一个非空值。
+
+          这里放一个无害的占位变量；native 层会忽略未识别的 GLESMOD_* 变量。
+        -->
+        <meta-data
+            android:name="boatEnv"
+            android:value="GLESMOD_BOAT_ENV_NOOP=1" />
+
+        <!--
+          注入的环境变量，格式 KEY=VALUE:KEY=VALUE
+
+          【POJAV_RENDERER 是必需项，缺失会直接 SIGSEGV】
+            FCL 的 egl_bridge.c 中 pojavInitOpenGL() 无条件解引用它：
+                const char *renderer = getenv("POJAV_RENDERER");
+                if (!strncmp("opengles", renderer, 8)) { ... }
+            而 FCL 只为【v2 插件】从 Renderer.pojavRendererId 设置该变量，
+            v1 插件的 pojavRendererId 为空串、不设置。
+            缺失时 getenv 返回 NULL，strncmp 读非法地址，进程在
+            GLFW.glfwInit() → pojavInit() 阶段崩溃（实测已验证）。
+
+            取值说明：只要以 "opengles" 开头就会选用 GL4ES 风格的 EGL 桥
+            （gl_init / gl_init_context / gl_swap_buffers），
+            这正是我们需要的：它按 POJAVEXEC_EGL 加载 EGL，
+            并按 LIBGL_ES 创建对应版本的上下文。
+            这里取 "opengles3"，与内置的 NG-GL4ES（同样是 GL→ES 转发层）一致。
+
+          【LIBGL_ES=3 是必需项】
+            决定 EGL 上下文版本，FCL 只为内置渲染器自动设置。
+
+          【GLESMOD_LOG_LEVEL=1】
+            1 = 摘要（默认）。不要用 2：会输出大量逐符号解析日志，
+            而 FCL 的 stderr 是管道，日志过密有阻塞渲染线程的风险。
+
+          【GLESMOD_TRACE：三档】
+            0 = 关闭追踪（稳态零钩子开销）
+            1 = 默认。只在「初始化结束前的那些调用」上记录（见下方说明）
+            2 = 深度追踪。每次调用都记录完整序列，
+                用于排查「启动很久之后才崩」的问题。
+                代价：每个 GL 调用多一次分支 + 一次无锁原子自增。
+
+            为什么默认是 1 而不是「全时段记录」：
+              反汇编 optimized 产物实测（native/tools/hotpath_cost.py）：
+              到达真正的 GLES 调用需要 29 条指令，其中真正必要的只有 5 条。
+              按每帧 5e4 次 GL 调用估算，那 24 条序言约合 0.2 ms/帧；
+              在 300 FPS（3.3 ms/帧）下占 6%。
+              改为「默认只追踪初始化阶段」后降到 15 条（含必要的收尾指令）。
+
+              而追踪的目的（崩溃后看 status.json 的 last_calls）在真机两次
+              SIGSEGV 中都是**早期初始化阶段**的问题 —— 默认档已覆盖。
+              若需长时间运行后崩溃的完整序列，把此项改为 2 即可，
+              无需重新构建。
+
+          【GLESMOD_SHADER_PROBE / GLESMOD_GEOM_PROBE：排查期临时打开】
+            SHADER_PROBE=1 把每个着色器的「原始源码」与「转换后源码」
+            落盘到 glesmod/native.log，用于判断转换器是否真的生效。
+            GEOM_PROBE=1 开启几何诊断探针（见 native/src/probe.c）：
+            每秒汇总一次 glDrawElements 的调用次数与 count 分桶，
+            并转储当时生效的 ProjMat、深度/剔除状态、视口与深度范围。
+            用于定位「方块与实体几何错位」这类问题。
+            其日志体积有界（每秒一条），不会刷屏。
+
+            这两项只影响诊断输出，不改变渲染行为。
+            当前处于渲染问题排查期，故保持开启。
+
+            SHADER_PROBE 保持 =1 的理由：它只在**编译失败时**才转储源码，
+            着色器全部通过时仅产生每个 shader 一行调用记录（约百余行），
+            日志体积可忽略；而一旦出现着色器回归，它是唯一能拿到
+            「原始源码 + 转换后源码 + 驱动原话」的手段，不能为了省空间而关掉。
+
+          其余为模组自身配置，native 层在 dlopen 前即可读取。
+        -->
+        <meta-data
+            android:name="pojavEnv"
+            android:value="POJAV_RENDERER=opengles3:LIBGL_ES=3:GLESMOD_ABI=1:GLESMOD_ENABLE=1:GLESMOD_DEGRADE_LEVEL=1:GLESMOD_LOG_LEVEL=1:GLESMOD_TRACE=1:GLESMOD_SHADER_PROBE=0:GLESMOD_GEOM_PROBE=0" />
+
+        <!-- 兼容的 MC 版本范围，避免 FCL 在不兼容版本下提供本渲染器 -->
+        <meta-data
+            android:name="minMCVer"
+            android:value="1.21.1" />
+        <meta-data
+            android:name="maxMCVer"
+            android:value="1.21.1" />
+
+    </application>
+</manifest>

@@ -1,0 +1,11 @@
+{
+  "glesmod.configuration.title": "GLES Mod 设置",
+  "glesmod.configuration.section.glesmod.common.toml": "GLES Mod 设置",
+  "glesmod.configuration.section.glesmod.common.toml.title": "GLES Mod 设置",
+
+  "glesmod.configuration.enabled": "启用模组",
+  "glesmod.configuration.degradeLevel": "降级档位",
+  "glesmod.configuration.verboseLog": "输出详细诊断报告",
+  "glesmod.configuration.warnIfInactive": "后端未激活时警告",
+  "glesmod.configuration.pollStatusFile": "轮询状态文件"
+}

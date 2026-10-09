@@ -1,0 +1,3 @@
+阶段=顶点
+ERROR: 7:2: 'vec2' : Syntax error:  syntax error
+INTERNAL ERROR: no main() function!

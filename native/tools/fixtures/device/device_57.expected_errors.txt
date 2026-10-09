@@ -1,0 +1,2 @@
+阶段=片元
+ERROR: 0:106: '/' :  wrong operand types  no operation '/' exists that takes a left-hand operand of type 'const 2-component vector of float' and a right operand of type '2-component vector of int' (or there is no acceptable conversion)
