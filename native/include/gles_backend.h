@@ -86,10 +86,12 @@ extern "C" {
  * 名字来自启动器：FCL 读 POJAVEXEC_EGL，真机实测值为 "libEGL.so"。
  */
 #define GLESMOD_ENV_EXEC_EGL      "POJAVEXEC_EGL"         /* 启动器使用的 EGL 库名 */
+#define GLESMOD_ENV_LIBGL_GLES    "LIBGL_GLES"            /* 可选的 GLES 库名；ANGLE 模式通常为 libGLESv2_angle.so */
 
 #define GLESMOD_ENV_LOG_FILE      "GLESMOD_LOG_FILE"      /* 覆盖日志文件路径 */
 #define GLESMOD_ENV_SHADER_PROBE  "GLESMOD_SHADER_PROBE"  /* 0/1，默认 0：转储着色器 */
 #define GLESMOD_ENV_GEOM_PROBE    "GLESMOD_GEOM_PROBE"    /* 0/1，默认 0：几何诊断探针 */
+#define GLESMOD_ENV_PROXY_EMU     "GLESMOD_PROXY_EMU"     /* 0/1，默认 1：proxy texture 仿真 */
 
 /* 状态文件相对路径（相对游戏工作目录） */
 #define GLESMOD_STATUS_RELPATH    "glesmod/status.json"

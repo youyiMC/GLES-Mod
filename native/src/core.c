@@ -644,14 +644,36 @@ static void *get_gles_handle(void) {
     if (g_gles_handle_tried) return g_gles_handle;
     g_gles_handle_tried = 1;
 
+    /*
+     * 兜底句柄必须与当前 EGL 同源：
+     *   - 插件显式设置 LIBGL_GLES 时优先用它（ANGLE 模式通常是
+     *     libGLESv2_angle.so）；
+     *   - 否则若 POJAVEXEC_EGL 指向 ANGLE（libEGL_angle.so），
+     *     用 libGLESv2_angle.so；
+     *   - 最后才是系统 libGLESv2.so。
+     *
+     * 如果这里在 ANGLE 模式下仍打开系统 libGLESv2.so，主路径虽然
+     * 走 eglGetProcAddress，但一旦某个符号没覆盖，兜底会拿到厂商
+     * 驱动实例，与 ANGLE 上下文不是同一份实现。
+     */
+    const char *chosen = "libGLESv2.so";
+    const char *libgl_gles = glesmod_env_str(GLESMOD_ENV_LIBGL_GLES);
+    const char *egl_name = glesmod_env_str(GLESMOD_ENV_EXEC_EGL);
+
+    if (libgl_gles != NULL && libgl_gles[0] != '\0') {
+        chosen = libgl_gles;
+    } else if (egl_name != NULL && strstr(egl_name, "angle") != NULL) {
+        chosen = "libGLESv2_angle.so";
+    }
+
     /* RTLD_LOCAL：只需句柄做 dlsym，无需暴露自己的符号。
      * RTLD_NOW：立即解析，便于尽早暴露链接问题。 */
-    g_gles_handle = dlopen("libGLESv2.so", RTLD_NOW | RTLD_LOCAL);
+    g_gles_handle = dlopen(chosen, RTLD_NOW | RTLD_LOCAL);
     if (g_gles_handle == NULL) {
-        log_line(0, "无法 dlopen libGLESv2.so: %s", dlerror());
+        log_line(0, "无法 dlopen %s: %s", chosen, dlerror());
         return NULL;
     }
-    log_line(1, "已打开 libGLESv2.so (%p)", g_gles_handle);
+    log_line(1, "已打开 %s (%p)", chosen, g_gles_handle);
     return g_gles_handle;
 }
 
@@ -795,6 +817,26 @@ glesmod_proc_t glesym_resolve(const char *name) {
 /* 能力探测                                                            */
 /* ------------------------------------------------------------------ */
 
+/*
+ * 判断空格分隔的扩展串是否包含完整 token。
+ *
+ * 必须按 token 边界匹配：裸 strstr 可能把更长的扩展名误判成目标
+ * （例如目标名是另一个扩展名的前缀）。
+ */
+int glesmod_extension_present(const char *extensions, const char *name) {
+    if (extensions == NULL || name == NULL || name[0] == '\0') return 0;
+
+    size_t n = strlen(name);
+    const char *p = extensions;
+    while ((p = strstr(p, name)) != NULL) {
+        int left_ok = (p == extensions) || (p[-1] == ' ');
+        int right_ok = (p[n] == ' ' || p[n] == '\0');
+        if (left_ok && right_ok) return 1;
+        p += n;
+    }
+    return 0;
+}
+
 /* 用给定函数名探测能力，存在则设置能力位 */
 static void probe_proc(const char *name, unsigned int bit) {
     glesmod_proc_t fn = glesym_resolve(name);
@@ -910,9 +952,31 @@ static int probe_capabilities(void) {
         probe_proc("glTexStorage2D", GLESMOD_CAP_TEXTURE_STORAGE);
     }
 
-    /* Multi-Draw：ES 没有核心支持，只有少数驱动提供扩展 */
-    if (glesym_resolve("glMultiDrawElements") != NULL) {
-        g_caps.flags |= GLESMOD_CAP_MULTI_DRAW;
+    /*
+     * Multi-Draw：只对 GL_EXT_multi_draw_indirect 做原生加速。
+     *
+     * 不能只看符号：Android 的 EGL 包装层可能返回一个“存在但不可用”的
+     * 入口点。这里要求驱动扩展串明确声明，并且对应函数可解析；真正的
+     * 探测与回退由 custom.c 在首次调用时完成。
+     */
+    if (get_string != NULL) {
+        const char *ext = (const char *)get_string(GLESMOD_GL_EXTENSIONS);
+        int has_ext =
+            glesmod_extension_present(ext, "GL_EXT_multi_draw_indirect");
+        int has_arrays =
+            has_ext && glesym_resolve("glMultiDrawArraysIndirectEXT") != NULL;
+        int has_elements =
+            has_ext && glesym_resolve("glMultiDrawElementsIndirectEXT") != NULL;
+
+        log_line(1, "Multi-Draw: GL_EXT_multi_draw_indirect=%d, "
+                    "arrays=%d, elements=%d",
+                 has_ext, has_arrays, has_elements);
+
+        if (has_arrays || has_elements) {
+            g_caps.flags |= GLESMOD_CAP_MULTI_DRAW;
+        }
+    } else {
+        log_line(1, "Multi-Draw: 无法读取扩展串，使用逐条 indirect 回退");
     }
 
     /* 持久映射：ES 3.0+ 有 glMapBufferRange，但持久映射位需扩展 */

@@ -2,4 +2,42 @@
 <resources>
     <string name="app_name">GLES Mod Renderer</string>
     <string name="renderer_desc">GLES Mod（原生 OpenGL ES）</string>
+
+    <!--
+      FCL RendererPlugin v2 配置。
+
+      rendererId 用稳定 ID "glesmod"；POJAV_RENDERER 由 NormalEnv 显式提供，
+      不依赖 FCL 当前把 rendererId 当 POJAV_RENDERER 的实现细节。
+
+      rendererEGLPath 保持系统 libEGL.so；ANGLE 开关打开时，
+      ToggleableEnv 会额外注入 POJAVEXEC_EGL=libEGL_angle.so，覆盖默认值。
+    -->
+    <string name="renderer_config" translatable="false">{
+  \"displayName\": \"GLES Mod\",
+  \"rendererId\": \"glesmod\",
+  \"rendererGLPath\": \"**|libgl_gles.so\",
+  \"rendererEGLPath\": \"libEGL.so\",
+  \"env\": [
+    { \"type\": \"NormalEnv\", \"key\": \"POJAV_RENDERER\", \"value\": \"opengles3\" },
+    { \"type\": \"NormalEnv\", \"key\": \"LIBGL_ES\", \"value\": \"3\" },
+    { \"type\": \"NormalEnv\", \"key\": \"GLESMOD_ABI\", \"value\": \"1\" },
+    { \"type\": \"NormalEnv\", \"key\": \"GLESMOD_ENABLE\", \"value\": \"1\" },
+    { \"type\": \"NormalEnv\", \"key\": \"GLESMOD_DEGRADE_LEVEL\", \"value\": \"1\" },
+    { \"type\": \"NormalEnv\", \"key\": \"GLESMOD_LOG_LEVEL\", \"value\": \"1\" },
+    { \"type\": \"NormalEnv\", \"key\": \"GLESMOD_TRACE\", \"value\": \"1\" },
+    { \"type\": \"NormalEnv\", \"key\": \"GLESMOD_SHADER_PROBE\", \"value\": \"0\" },
+    { \"type\": \"NormalEnv\", \"key\": \"GLESMOD_GEOM_PROBE\", \"value\": \"0\" },
+    {
+      \"type\": \"ToggleableEnv\",
+      \"key\": \"POJAVEXEC_EGL\",
+      \"value\": \"libEGL_angle.so\",
+      \"toggle\": false,
+      \"title\": { \"key\": \"gles_driver_angle\" }
+    }
+  ],
+  \"minMCVer\": \"1.21.1\",
+  \"maxMCVer\": \"1.21.1\"
+}</string>
+
+    <string name="gles_driver_angle">使用 ANGLE 作为 GLES 驱动（实验性）</string>
 </resources>

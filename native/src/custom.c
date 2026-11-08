@@ -12,7 +12,7 @@
  *   glLogicOp               ES 无逻辑运算                      忽略 + 降级
  *   glGetTexImage           ES 无纹理回读                      用 FBO + ReadPixels
  *   glDrawPixels            ES 无                              忽略 + 降级（NativeImage 路径）
- *   glMultiDraw*            ES 无多重绘制                      拆解为循环绘制
+ *   glMultiDraw*            ES 无核心 Multi-Draw              仅 indirect 扩展原生，其他循环
  *   glBufferStorage         ES 无（GL 4.4 功能）               用 glBufferData 真实
  *                                                               分配 + 记录降级
  *   glMapBufferRange        桌面专属映射位 ES 非法              剥离非法位后转发
@@ -39,6 +39,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+/* gl.xml: GL_NUM_EXTENSIONS = 0x821D, GL_EXTENSIONS = 0x1F03 */
+#define GLESMOD_ENUM_GL_NUM_EXTENSIONS 0x821D
+#define GLESMOD_ENUM_GL_EXTENSIONS     GLESMOD_GL_EXTENSIONS
+
+/* glGetError 的最小类型；纹理探针与 Multi-Draw 探测共用。 */
+typedef GLenum (*get_err_fn_t)(void);
+static get_err_fn_t texprobe_get_error(void);
+static void drain_errors(get_err_fn_t get_err);
 
 /* ================================================================== */
 /* 辅助：取得 GLES 函数指针                                            */
@@ -354,20 +363,106 @@ void glGetTexImage(GLenum target, GLint level, GLenum format,
 }
 
 /* ================================================================== */
-/* glMultiDraw* —— ES 无多重绘制，拆解为循环                           */
+/* glMultiDraw* —— 仅 indirect 扩展原生，其他拆解为循环                   */
 /* ================================================================== */
 
 /*
- * 这是任务书 P2-04 要求的降级路由。原版 MC 不使用（见 O-02），
- * 但 Sodium 会使用，因此必须实现。
+ * ES 3.2 核心没有 Multi-Draw。本实现只对
+ * GL_EXT_multi_draw_indirect 做原生加速：
+ *       glMultiDrawArraysIndirectEXT / glMultiDrawElementsIndirectEXT
  *
- * 拆解语义：
- *   glMultiDrawElements(mode, count, type, indices, drawcount)
- *   == for (i = 0; i < drawcount; i++) glDrawElements(mode, count[i], type, indices[i]);
+ * 基础 glMultiDrawArrays / glMultiDrawElements / BaseVertex 没有原生路径，
+ * 始终走循环拆解；ANGLE 的 multi-draw 扩展也不参与。
  *
- * 性能影响：每增加一次绘制调用，CPU 开销增加。在 ES 上这是唯一可行方案。
- * 仅在首次调用时记录降级事件，避免每帧刷屏。
+ * 检测原则（参考 MobileGlues 的结论，实现独立编写）：
+ *   1. 只认「扩展串 + 函数指针」同时存在。Android 的 EGL 包装层可能
+ *      返回一个存在但不可用的入口点，单看符号不算证据。
+ *   2. 首次调用做一次错误探测：调用前抽干错误队列，调用后若仍有错误，
+ *      将该后端标记为 FAILED 并回退循环，后续不再尝试。
+ *   3. 原生成功不记降级；只有原生不可用/探测失败才记录
+ *      MULTI_DRAW_UNSUPPORTED。
  */
+
+typedef void (*glesmod_md_arrays_indirect_fn)(GLenum, const void *, GLsizei,
+                                              GLsizei);
+typedef void (*glesmod_md_elements_indirect_fn)(GLenum, GLenum, const void *,
+                                                GLsizei, GLsizei);
+
+/* GL 4.6 DrawArraysIndirect / DrawElementsIndirect 命令布局：
+ * 前者 4 个 32 位字，后者 5 个。stride=0 时使用这个紧凑布局。 */
+#define GLESMOD_DRAW_ARRAYS_INDIRECT_STRIDE   16
+#define GLESMOD_DRAW_ELEMENTS_INDIRECT_STRIDE 20
+
+typedef enum {
+    GLESMOD_MD_UNPROBED = 0,
+    GLESMOD_MD_WORKING,
+    GLESMOD_MD_FAILED
+} glesmod_md_state_t;
+
+typedef struct {
+    int initialized;
+    glesmod_md_arrays_indirect_fn arrays_indirect;
+    glesmod_md_elements_indirect_fn elements_indirect;
+    glesmod_md_state_t arrays_indirect_state;
+    glesmod_md_state_t elements_indirect_state;
+} glesmod_multidraw_t;
+
+static glesmod_multidraw_t g_multidraw;
+
+static void glesmod_multidraw_detect(void)
+{
+    if (g_multidraw.initialized) return;
+    g_multidraw.initialized = 1;
+
+    const char *ext = (const char *)glGetString(GLESMOD_ENUM_GL_EXTENSIONS);
+    if (!glesmod_extension_present(ext, "GL_EXT_multi_draw_indirect")) {
+        glesmod_log("Multi-Draw: 未检测到 GL_EXT_multi_draw_indirect，"
+                    "使用逐条 indirect 回退");
+        return;
+    }
+
+    g_multidraw.arrays_indirect =
+        (glesmod_md_arrays_indirect_fn)glesym_resolve(
+            "glMultiDrawArraysIndirectEXT");
+    g_multidraw.elements_indirect =
+        (glesmod_md_elements_indirect_fn)glesym_resolve(
+            "glMultiDrawElementsIndirectEXT");
+
+    if (g_multidraw.arrays_indirect != NULL ||
+        g_multidraw.elements_indirect != NULL) {
+        glesmod_log("Multi-Draw: 检测到 GL_EXT_multi_draw_indirect，"
+                    "优先使用原生 indirect 入口"
+                    "（GLESMOD_MULTIDRAW_NATIVE）");
+    } else {
+        glesmod_log("Multi-Draw: GL_EXT_multi_draw_indirect 已声明但入口点"
+                    "不可用，使用逐条 indirect 回退");
+    }
+}
+
+/* 首次调用探测：UNPROBED 时抽干错误，调用后检查一次。 */
+static int glesmod_multidraw_begin(glesmod_md_state_t *state)
+{
+    if (*state == GLESMOD_MD_FAILED) return 0;
+    if (*state == GLESMOD_MD_UNPROBED) {
+        get_err_fn_t get_err = texprobe_get_error();
+        if (get_err != NULL) drain_errors(get_err);
+    }
+    return 1;
+}
+
+static int glesmod_multidraw_end(glesmod_md_state_t *state)
+{
+    if (*state == GLESMOD_MD_UNPROBED) {
+        get_err_fn_t get_err = texprobe_get_error();
+        if (get_err != NULL && get_err() != 0 /* GL_NO_ERROR */) {
+            *state = GLESMOD_MD_FAILED;
+            return 0;
+        }
+        *state = GLESMOD_MD_WORKING;
+    }
+    return 1;
+}
+
 void glMultiDrawElements(GLenum mode, const GLsizei *count, GLenum type,
                          const void *const *indices, GLsizei drawcount) {
     typedef void (*draw_elements_t)(GLenum, GLsizei, GLenum, const void *);
@@ -446,6 +541,76 @@ void glMultiDrawElementsBaseVertex(GLenum mode, const GLsizei *count, GLenum typ
         glesmod_degrade(GLESMOD_DEGRADE_MULTI_DRAW_UNSUPPORTED,
                         "BaseVertex 不可用，已降级为 glDrawElements（几何体可能偏移）");
     }
+}
+
+void glMultiDrawArraysIndirect(GLenum mode, const void *indirect,
+                               GLsizei drawcount, GLsizei stride) {
+    typedef void (*draw_arrays_indirect_t)(GLenum, const void *);
+    static draw_arrays_indirect_t real = NULL;
+
+    glesmod_lazy_init();
+
+    if (drawcount <= 0) return;
+    if (stride < 0) {
+        glesmod_degrade(GLESMOD_DEGRADE_MULTI_DRAW_UNSUPPORTED,
+                        "glMultiDrawArraysIndirect: stride < 0，已忽略");
+        return;
+    }
+
+    glesmod_multidraw_detect();
+    if (g_multidraw.arrays_indirect != NULL &&
+        glesmod_multidraw_begin(&g_multidraw.arrays_indirect_state)) {
+        g_multidraw.arrays_indirect(mode, indirect, drawcount, stride);
+        if (glesmod_multidraw_end(&g_multidraw.arrays_indirect_state)) return;
+        glesmod_log("Multi-Draw: 原生 ArraysIndirect 探测失败，改用循环");
+    }
+
+    RESOLVE_OR_RETURN(real, "glDrawArraysIndirect", );
+
+    const GLsizei step = stride ? stride : GLESMOD_DRAW_ARRAYS_INDIRECT_STRIDE;
+    const uintptr_t base = (uintptr_t)indirect;
+    for (GLsizei i = 0; i < drawcount; i++) {
+        real(mode, (const void *)(base + (uintptr_t)i * (uintptr_t)step));
+    }
+
+    glesmod_degrade(GLESMOD_DEGRADE_MULTI_DRAW_UNSUPPORTED,
+                    "Multi-Draw Indirect 原生不可用，"
+                    "已降级为逐条 glDrawArraysIndirect");
+}
+
+void glMultiDrawElementsIndirect(GLenum mode, GLenum type, const void *indirect,
+                                 GLsizei drawcount, GLsizei stride) {
+    typedef void (*draw_elements_indirect_t)(GLenum, GLenum, const void *);
+    static draw_elements_indirect_t real = NULL;
+
+    glesmod_lazy_init();
+
+    if (drawcount <= 0) return;
+    if (stride < 0) {
+        glesmod_degrade(GLESMOD_DEGRADE_MULTI_DRAW_UNSUPPORTED,
+                        "glMultiDrawElementsIndirect: stride < 0，已忽略");
+        return;
+    }
+
+    glesmod_multidraw_detect();
+    if (g_multidraw.elements_indirect != NULL &&
+        glesmod_multidraw_begin(&g_multidraw.elements_indirect_state)) {
+        g_multidraw.elements_indirect(mode, type, indirect, drawcount, stride);
+        if (glesmod_multidraw_end(&g_multidraw.elements_indirect_state)) return;
+        glesmod_log("Multi-Draw: 原生 ElementsIndirect 探测失败，改用循环");
+    }
+
+    RESOLVE_OR_RETURN(real, "glDrawElementsIndirect", );
+
+    const GLsizei step = stride ? stride : GLESMOD_DRAW_ELEMENTS_INDIRECT_STRIDE;
+    const uintptr_t base = (uintptr_t)indirect;
+    for (GLsizei i = 0; i < drawcount; i++) {
+        real(mode, type, (const void *)(base + (uintptr_t)i * (uintptr_t)step));
+    }
+
+    glesmod_degrade(GLESMOD_DEGRADE_MULTI_DRAW_UNSUPPORTED,
+                    "Multi-Draw Indirect 原生不可用，"
+                    "已降级为逐条 glDrawElementsIndirect");
 }
 
 /* ================================================================== */
@@ -753,8 +918,6 @@ static int fixup_pixel_type(const char *who, GLint internalformat,
  * 【限流改为按参数指纹】不同参数组合各详列一次（上限 16 条）。
  *   这既能捞到 Iris 真正用的那组，又不会因每帧重试而刷屏。
  */
-typedef GLenum (*get_err_fn_t)(void);
-
 static get_err_fn_t texprobe_get_error(void)
 {
     static get_err_fn_t f = NULL;
@@ -820,6 +983,229 @@ static const char *tex_internalformat_name(GLint f)
     }
 }
 
+/* ================================================================== */
+/* Proxy texture 仿真                                                  */
+/* ================================================================== */
+
+/*
+ * 桌面 GL 的 GL_PROXY_TEXTURE_* 不是真正的纹理分配：
+ *   glTexImage2D(proxy, ...) 只记录“这个尺寸能不能分配”
+ *   glGetTexLevelParameter*  再把记录值读回来
+ *
+ * GLES 没有 proxy target。厂商 GLES 驱动通常返回 0 / INVALID_ENUM；
+ * ANGLE 2.1.1 的 glGetTexLevelParameteriv 对 InvalidEnum 会空指针崩溃。
+ *
+ * 因此我们在这里完整仿真 proxy 语义，proxy target 不进入驱动。
+ * 参考 MobileGlues 的 gl/texture.cpp 实现（按语义自行实现，不逐字复制）。
+ */
+
+#define GLESMOD_GL_PROXY_TEXTURE_1D                      0x8063
+#define GLESMOD_GL_PROXY_TEXTURE_2D                      0x8064
+#define GLESMOD_GL_PROXY_TEXTURE_3D                      0x8070
+#define GLESMOD_GL_PROXY_TEXTURE_RECTANGLE               0x84F7
+#define GLESMOD_GL_PROXY_TEXTURE_CUBE_MAP                0x851B
+#define GLESMOD_GL_PROXY_TEXTURE_1D_ARRAY                0x8C19
+#define GLESMOD_GL_PROXY_TEXTURE_2D_ARRAY                0x8C1B
+#define GLESMOD_GL_PROXY_TEXTURE_CUBE_MAP_ARRAY          0x900B
+#define GLESMOD_GL_PROXY_TEXTURE_2D_MULTISAMPLE          0x9101
+#define GLESMOD_GL_PROXY_TEXTURE_2D_MULTISAMPLE_ARRAY    0x9103
+
+#define GLESMOD_GL_TEXTURE_WIDTH                         0x1000
+#define GLESMOD_GL_TEXTURE_HEIGHT                        0x1001
+#define GLESMOD_GL_TEXTURE_INTERNAL_FORMAT               0x1003
+#define GLESMOD_GL_MAX_TEXTURE_SIZE                      0x0D33
+
+typedef struct {
+    GLsizei width;          /* base level（level 0）宽度 */
+    GLsizei height;
+    GLenum  internal_format;
+    int     valid;
+} glesmod_proxy_state_t;
+
+/* 每个线程一份；MC 的探测在 Render thread 上，单线程足够。 */
+static __thread glesmod_proxy_state_t g_proxy_state;
+static __thread int g_proxy_logged = 0;
+static __thread GLenum g_proxy_unsupported_logged[8];
+static __thread int g_proxy_unsupported_count = 0;
+
+static int glesmod_is_proxy_target(GLenum target)
+{
+    switch (target) {
+        case GLESMOD_GL_PROXY_TEXTURE_1D:
+        case GLESMOD_GL_PROXY_TEXTURE_2D:
+        case GLESMOD_GL_PROXY_TEXTURE_3D:
+        case GLESMOD_GL_PROXY_TEXTURE_RECTANGLE:
+        case GLESMOD_GL_PROXY_TEXTURE_CUBE_MAP:
+        case GLESMOD_GL_PROXY_TEXTURE_1D_ARRAY:
+        case GLESMOD_GL_PROXY_TEXTURE_2D_ARRAY:
+        case GLESMOD_GL_PROXY_TEXTURE_CUBE_MAP_ARRAY:
+        case GLESMOD_GL_PROXY_TEXTURE_2D_MULTISAMPLE:
+        case GLESMOD_GL_PROXY_TEXTURE_2D_MULTISAMPLE_ARRAY:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+/*
+ * 真正实现了 proxy 语义的 target。
+ *
+ * 只保留已验证的 2D / cube / rectangle：
+ *   - 它们的尺寸只随 mip level 缩小 width/height；
+ *   - depth/layers 恒为 1；
+ *   - MC 1.21.1 的 maxSupportedTextureSize 只走 GL_PROXY_TEXTURE_2D。
+ *
+ * 1D/3D/array/multisample 不在列表里：它们仍然被 glesmod_is_proxy_target()
+ * 识别，但按“未实现”安全降级，不进入 ANGLE。
+ */
+static int glesmod_is_emulated_proxy_target(GLenum target)
+{
+    switch (target) {
+        case GLESMOD_GL_PROXY_TEXTURE_2D:
+        case GLESMOD_GL_PROXY_TEXTURE_CUBE_MAP:
+        case GLESMOD_GL_PROXY_TEXTURE_RECTANGLE:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+/* 0 = 关闭仿真（退回旧行为），1 = 启用；默认启用。 */
+static int glesmod_proxy_emu_enabled(void)
+{
+    static int cached = -1;
+    if (cached < 0) {
+        const char *v = glesmod_env_str(GLESMOD_ENV_PROXY_EMU);
+        cached = (v != NULL && v[0] != '\0' && strcmp(v, "0") == 0) ? 0 : 1;
+    }
+    return cached;
+}
+
+/*
+ * 一个 proxy target 在本次调用里应该怎么处理。
+ *
+ * 所有入口（glTexImage2D/3D、glGetTexLevelParameteriv/fv）都只判断
+ * 这一个结果，避免把「是否 proxy / 是否启用仿真 / 是否已实现」三件事
+ * 复制到四个地方；后者会导致新增 target 时漏改某个入口。
+ */
+typedef enum {
+    GLESMOD_PROXY_PASS = 0,   /* 不是 proxy，或仿真关闭：原样转发给驱动 */
+    GLESMOD_PROXY_EMULATE,    /* 已实现：读写本地 proxy 状态 */
+    GLESMOD_PROXY_REJECT      /* 未实现：不进入驱动，按不可分配处理 */
+} glesmod_proxy_action_t;
+
+static glesmod_proxy_action_t glesmod_proxy_action(GLenum target)
+{
+    if (!glesmod_is_proxy_target(target)) return GLESMOD_PROXY_PASS;
+    if (!glesmod_proxy_emu_enabled()) return GLESMOD_PROXY_PASS;
+    return glesmod_is_emulated_proxy_target(target)
+               ? GLESMOD_PROXY_EMULATE
+               : GLESMOD_PROXY_REJECT;
+}
+
+static void glesmod_log_proxy_unsupported(GLenum target)
+{
+    int i;
+    char msg[128];
+
+    for (i = 0; i < g_proxy_unsupported_count; i++) {
+        if (g_proxy_unsupported_logged[i] == target) return;
+    }
+    if (g_proxy_unsupported_count <
+        (int)(sizeof(g_proxy_unsupported_logged) / sizeof(g_proxy_unsupported_logged[0]))) {
+        g_proxy_unsupported_logged[g_proxy_unsupported_count++] = target;
+    }
+    snprintf(msg, sizeof(msg),
+             "[GLESMod] proxy target 0x%04X 未实现，按不可分配处理",
+             (unsigned)target);
+    glesmod_log(msg);
+}
+
+static GLint glesmod_proxy_max_texture_size(void)
+{
+    static GLint cached = 0;
+    if (cached <= 0) {
+        typedef void (*get_int_t)(GLenum, GLint *);
+        get_int_t get_int = (get_int_t)glesym_resolve("glGetIntegerv");
+        GLint v = 0;
+        if (get_int != NULL) {
+            get_int(GLESMOD_GL_MAX_TEXTURE_SIZE, &v);
+        }
+        /* 查询失败时保守取 4096，让 MC 自然回落到自己的 GL_MAX_TEXTURE_SIZE。 */
+        cached = (v > 0) ? v : 4096;
+    }
+    return cached;
+}
+
+static GLsizei glesmod_proxy_base_size(GLsizei size, GLint level)
+{
+    if (size <= 0) return 0;
+    if (level <= 0) return size;
+    if (level >= 31) return 0;
+    if (size > (GLsizei)(0x7fffffff >> level)) return 0;
+    return (GLsizei)(size << level);
+}
+
+static GLint glesmod_proxy_level_size(GLint base, GLint level)
+{
+    if (base <= 0) return 0;
+    if (level <= 0) return base;
+    if (level >= 31) return 1;
+    {
+        GLint v = base >> level;
+        return (v > 0) ? v : 1;
+    }
+}
+
+static void glesmod_proxy_record(GLenum target, GLint level, GLint internalformat,
+                                 GLsizei width, GLsizei height)
+{
+    GLint max = glesmod_proxy_max_texture_size();
+
+    GLsizei base_w = glesmod_proxy_base_size(width, level);
+    GLsizei base_h = glesmod_proxy_base_size(height, level);
+
+    /*
+     * 桌面 proxy 语义：该 level 的任一维度超过 GL_MAX_TEXTURE_SIZE，
+     * 就视为“不可分配”，proxy 的尺寸读回 0。
+     */
+    if ((GLint)width > max || (GLint)height > max) {
+        base_w = 0;
+        base_h = 0;
+    }
+
+    g_proxy_state.width = base_w;
+    g_proxy_state.height = base_h;
+    g_proxy_state.internal_format = (GLenum)internalformat;
+    g_proxy_state.valid = 1;
+
+    if (!g_proxy_logged) {
+        char msg[256];
+        g_proxy_logged = 1;
+        snprintf(msg, sizeof(msg),
+                 "[GLESMod] proxy texture 仿真: target=0x%04X level=%d %dx%d max=%d -> %dx%d",
+                 (unsigned)target, (int)level, (int)width, (int)height,
+                 (int)max, (int)base_w, (int)base_h);
+        glesmod_log(msg);
+    }
+}
+
+static GLint glesmod_proxy_query(GLenum pname, GLint level)
+{
+    if (!g_proxy_state.valid) return 0;
+
+    switch (pname) {
+        case GLESMOD_GL_TEXTURE_WIDTH:
+            return glesmod_proxy_level_size(g_proxy_state.width, level);
+        case GLESMOD_GL_TEXTURE_HEIGHT:
+            return glesmod_proxy_level_size(g_proxy_state.height, level);
+        case GLESMOD_GL_TEXTURE_INTERNAL_FORMAT:
+            return (GLint)g_proxy_state.internal_format;
+        default:
+            return 0;
+    }
+}
+
 /*
  * 归因并记录一次失败的纹理分配。
  * 调用方必须已「先抽干、再调用、再取错误」。
@@ -856,9 +1242,7 @@ static void texprobe_report(const char *who, GLenum err, GLenum target,
      *   2. 每次进入世界都重试，会把 status.json 的降级事件表刷爆。
      * 因此只记录、不升级为降级事件。
      */
-    if (target == 0x8064 /* GL_PROXY_TEXTURE_2D */ ||
-        target == 0x8071 /* GL_PROXY_TEXTURE_3D */ ||
-        target == 0x8072 /* GL_PROXY_TEXTURE_CUBE_MAP */) {
+    if (glesmod_is_proxy_target(target)) {
         return;
     }
 
@@ -891,6 +1275,18 @@ void glTexImage2D(GLenum target, GLint level, GLint internalformat,
     static fn_t real = NULL;
 
     glesmod_lazy_init();
+
+    switch (glesmod_proxy_action(target)) {
+        case GLESMOD_PROXY_EMULATE:
+            glesmod_proxy_record(target, level, internalformat, width, height);
+            return;
+        case GLESMOD_PROXY_REJECT:
+            glesmod_log_proxy_unsupported(target);
+            return;
+        case GLESMOD_PROXY_PASS:
+        default:
+            break;
+    }
 
     GLenum f = format, t = type;
     fixup_depth_format("glTexImage2D", &internalformat, &f, &t);
@@ -925,6 +1321,16 @@ void glTexImage3D(GLenum target, GLint level, GLint internalformat,
 
     glesmod_lazy_init();
 
+    /*
+     * glesmod_proxy_record() 目前只定义 2D 语义（width/height）。
+     * 3D / array proxy 即使将来被标记为已实现，也必须先扩展记录结构，
+     * 因此这里对一切非 PASS 的 proxy target 都安全拒绝。
+     */
+    if (glesmod_proxy_action(target) != GLESMOD_PROXY_PASS) {
+        glesmod_log_proxy_unsupported(target);
+        return;
+    }
+
     GLenum f = format, t = type;
     fixup_depth_format("glTexImage3D", &internalformat, &f, &t);
 
@@ -939,6 +1345,66 @@ void glTexImage3D(GLenum target, GLint level, GLint internalformat,
         texprobe_report("glTexImage3D", get_err(), target, internalformat,
                         width, height, f, t, pixels);
     }
+}
+
+/* ================================================================== */
+/* glGetTexLevelParameteriv / fv —— proxy texture 查询                 */
+/* ================================================================== */
+
+void glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint *params)
+{
+    typedef void (*fn_t)(GLenum, GLint, GLenum, GLint *);
+    static fn_t real = NULL;
+
+    glesmod_lazy_init();
+
+    switch (glesmod_proxy_action(target)) {
+        case GLESMOD_PROXY_EMULATE:
+            if (params != NULL) {
+                *params = glesmod_proxy_query(pname, level);
+            }
+            return;
+        case GLESMOD_PROXY_REJECT:
+            if (params != NULL) {
+                *params = 0;
+            }
+            glesmod_log_proxy_unsupported(target);
+            return;
+        case GLESMOD_PROXY_PASS:
+        default:
+            break;
+    }
+
+    RESOLVE_OR_RETURN(real, "glGetTexLevelParameteriv", );
+    real(target, level, pname, params);
+}
+
+void glGetTexLevelParameterfv(GLenum target, GLint level, GLenum pname, GLfloat *params)
+{
+    typedef void (*fn_t)(GLenum, GLint, GLenum, GLfloat *);
+    static fn_t real = NULL;
+
+    glesmod_lazy_init();
+
+    switch (glesmod_proxy_action(target)) {
+        case GLESMOD_PROXY_EMULATE:
+            if (params != NULL) {
+                *params = (GLfloat)glesmod_proxy_query(pname, level);
+            }
+            return;
+        case GLESMOD_PROXY_REJECT:
+            if (params != NULL) {
+                *params = 0.0f;
+            }
+            glesmod_log_proxy_unsupported(target);
+            return;
+        case GLESMOD_PROXY_PASS:
+        default:
+            break;
+    }
+
+    RESOLVE_OR_RETURN(real, "glGetTexLevelParameterfv", );
+    real(target, level, pname, params);
 }
 
 /* ================================================================== */
@@ -1326,10 +1792,6 @@ void *glMapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length,
 #define GLESMOD_ENUM_GL_VERSION   0x1F02
 #define GLESMOD_ENUM_GL_RENDERER  0x1F01
 #define GLESMOD_ENUM_GL_GLSL_VER  0x8B8C
-
-/* gl.xml: GL_NUM_EXTENSIONS = 0x821D, GL_EXTENSIONS = 0x1F03 */
-#define GLESMOD_ENUM_GL_NUM_EXTENSIONS 0x821D
-#define GLESMOD_ENUM_GL_EXTENSIONS     0x1F03
 
 /*
  * 追加到扩展列表的那一条。

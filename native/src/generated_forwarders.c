@@ -6,9 +6,9 @@
  *       --out native/src/generated_forwarders.c
  *
  * 本文件包含三类实现：
- *   - 339 个转发函数（GLES 有同名函数）
- *   - 484 个安全 stub（GLES 不提供，返回零值并记降级）
- *   - 26 个定制实现在 custom.c（本文件不包含）
+ *   - 337 个转发函数（GLES 有同名函数）
+ *   - 482 个安全 stub（GLES 不提供，返回零值并记降级）
+ *   - 30 个定制实现在 custom.c（本文件不包含）
  *
  * 为什么需要 stub：LWJGL 在 GL.createCapabilities() 时需要一批函数，
  * 缺失会让它抛 NullPointerException 直接崩溃。导出为 stub 可让它拿到
@@ -2404,36 +2404,6 @@ GLESMOD_EXPORT void glGetSynciv(GLsync p0, GLenum p1, GLsizei p2, GLsizei * p3, 
         }
     }
     ((void (*)(GLsync, GLenum, GLsizei, GLsizei *, GLint *))fn)(p0, p1, p2, p3, p4);
-}
-
-/* glGetTexLevelParameterfv —— 转发至同名 GLES 函数 */
-GLESMOD_EXPORT void glGetTexLevelParameterfv(GLenum p0, GLint p1, GLenum p2, GLfloat * p3)
-{
-    GLESMOD_HOTPATH("glGetTexLevelParameterfv");
-    static glesmod_proc_t fn = NULL;
-    if (!fn) {
-        fn = glesym_resolve("glGetTexLevelParameterfv");
-        if (!fn) {
-            glesmod_report_missing("glGetTexLevelParameterfv");
-            return;
-        }
-    }
-    ((void (*)(GLenum, GLint, GLenum, GLfloat *))fn)(p0, p1, p2, p3);
-}
-
-/* glGetTexLevelParameteriv —— 转发至同名 GLES 函数 */
-GLESMOD_EXPORT void glGetTexLevelParameteriv(GLenum p0, GLint p1, GLenum p2, GLint * p3)
-{
-    GLESMOD_HOTPATH("glGetTexLevelParameteriv");
-    static glesmod_proc_t fn = NULL;
-    if (!fn) {
-        fn = glesym_resolve("glGetTexLevelParameteriv");
-        if (!fn) {
-            glesmod_report_missing("glGetTexLevelParameteriv");
-            return;
-        }
-    }
-    ((void (*)(GLenum, GLint, GLenum, GLint *))fn)(p0, p1, p2, p3);
 }
 
 /* glGetTexParameterIiv —— 转发至同名 GLES 函数 */
@@ -7382,18 +7352,6 @@ GLESMOD_EXPORT void glMatrixMode(GLenum p0)
     glesmod_report_stub("glMatrixMode");
 }
 
-/* glMultiDrawArraysIndirect —— GLES 不提供，安全 stub */
-GLESMOD_EXPORT void glMultiDrawArraysIndirect(GLenum p0, const void * p1, GLsizei p2, GLsizei p3)
-{
-    glesmod_lazy_init();
-    GLESMOD_TRACE("glMultiDrawArraysIndirect");
-    (void)p0;
-    (void)p1;
-    (void)p2;
-    (void)p3;
-    glesmod_report_stub("glMultiDrawArraysIndirect");
-}
-
 /* glMultiDrawArraysIndirectCount —— GLES 不提供，安全 stub */
 GLESMOD_EXPORT void glMultiDrawArraysIndirectCount(GLenum p0, const void * p1, GLintptr p2, GLsizei p3, GLsizei p4)
 {
@@ -7405,19 +7363,6 @@ GLESMOD_EXPORT void glMultiDrawArraysIndirectCount(GLenum p0, const void * p1, G
     (void)p3;
     (void)p4;
     glesmod_report_stub("glMultiDrawArraysIndirectCount");
-}
-
-/* glMultiDrawElementsIndirect —— GLES 不提供，安全 stub */
-GLESMOD_EXPORT void glMultiDrawElementsIndirect(GLenum p0, GLenum p1, const void * p2, GLsizei p3, GLsizei p4)
-{
-    glesmod_lazy_init();
-    GLESMOD_TRACE("glMultiDrawElementsIndirect");
-    (void)p0;
-    (void)p1;
-    (void)p2;
-    (void)p3;
-    (void)p4;
-    glesmod_report_stub("glMultiDrawElementsIndirect");
 }
 
 /* glMultiDrawElementsIndirectCount —— GLES 不提供，安全 stub */
